@@ -1,0 +1,33 @@
+{
+	"name": "backend",
+	"version": "1.0.0",
+	"private": "true",
+	"description": "",
+	"type": "module",
+	"scripts": {
+		"dev": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm --watch main.ts"
+	},
+	"prisma": {
+		"seed": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm seed.ts"
+	},
+	"engines": {
+		"node": "18.16.1"
+	},
+	"author": "scarf",
+	"license": "AGPL-3.0-only",
+	"dependencies": {
+		"@hono/node-server": "^1.2.0",
+		"@hono/zod-validator": "^0.1.9",
+		"@prisma/client": "^5.4.1",
+		"hono": "^3.7.5",
+		"http-terminator": "^3.2.0",
+		"zod": "^3.22.4",
+		"zod-prisma-types": "^2.7.9"
+	},
+	"devDependencies": {
+		"@swc-node/register": "^1.6.8",
+		"@types/node": "^20.8.3",
+		"prisma": "^5.4.1",
+		"typescript": "^5.2.2"
+	}
+}

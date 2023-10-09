@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+generator zod {
+    provider = "zod-prisma-types"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+}
+
+model Country {
+    id   Int    @id @default(autoincrement())
+    name String @unique
+
+    regions  Region[]
+    Position Position[]
+}
+
+model Region {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    Position  Position[]
+    country   Country    @relation(fields: [countryId], references: [id])
+    countryId Int
+}
+
+model Company {
+    id   Int    @id @default(autoincrement())
+    name String @unique
+
+    position Position[]
+}
+
+model Tech {
+    id   Int    @id @default(autoincrement())
+    name String @unique
+
+    position Position[] @relation("TechToPosition")
+}
+
+model Position {
+    id Int @id @default(autoincrement())
+
+    title       String
+    description String
+    reward      Int?
+
+    techStack Tech[] @relation("TechToPosition")
+
+    company   Company @relation(fields: [companyId], references: [id])
+    companyId Int
+    country   Country @relation(fields: [countryId], references: [id])
+    countryId Int
+    region    Region  @relation(fields: [regionId], references: [id])
+    regionId  Int
+}
