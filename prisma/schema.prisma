@@ -19,7 +19,6 @@ model Country {
     name String @unique
 
     regions  Region[]
-    Position Position[]
 }
 
 model Region {
@@ -29,6 +28,8 @@ model Region {
     Position  Position[]
     country   Country    @relation(fields: [countryId], references: [id])
     countryId Int
+
+    @@unique([name, countryId])
 }
 
 model Company {
@@ -56,8 +57,8 @@ model Position {
 
     company   Company @relation(fields: [companyId], references: [id])
     companyId Int
-    country   Country @relation(fields: [countryId], references: [id])
-    countryId Int
     region    Region  @relation(fields: [regionId], references: [id])
     regionId  Int
+
+    @@unique([title, companyId, regionId])
 }

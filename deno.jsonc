@@ -1,11 +1,9 @@
 {
+    "exclude": ["prisma"],
 	"fmt": {
 		"semiColons": false,
 		"lineWidth": 100,
 		"useTabs": true,
 		"proseWrap": "never"
-	},
-	"compilerOptions": {
-		"exactOptionalPropertyTypes": true
 	}
 }

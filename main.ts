@@ -1,61 +1,128 @@
-import { Hono } from "npm:hono@3.7.5"
-import { zValidator } from "npm:@hono/zod-validator@0.1.9"
-import { z } from "npm:zod@3.22.4"
-import { numericSchema, positions, positionSchema } from "./data.ts"
+import { Hono } from "hono"
+import { cors } from "hono/cors"
+import { logger } from "hono/logger"
+import { zValidator } from "@hono/zod-validator"
+import { Prisma, PrismaClient } from "@prisma/client"
+import { serve } from "@hono/node-server"
+import { z } from "zod"
 
-export const createApp = () => {
+import {
+	PositionCreateInputSchema,
+	PositionUpdateWithoutCompanyInputSchema,
+} from "./prisma/generated/zod/index.ts"
+
+import { NumericSchema } from "./data"
+import { createHttpTerminator } from "http-terminator"
+import { Server } from "node:http"
+import { showUniqueRoutes } from "./unique_routes.ts"
+import { isMain } from "./is_main.ts"
+
+const include = {
+	company: true,
+	region: { include: { country: true } },
+	techStack: true,
+} satisfies Prisma.PositionInclude
+
+const fuzzySearch = (search?: string) =>
+	search
+		? ({
+			OR: [
+				{ company: { name: { contains: search } } },
+				{ title: { contains: search } },
+				{ description: { contains: search } },
+				{ techStack: { some: { name: { contains: search } } } },
+			],
+		} satisfies Prisma.PositionWhereInput)
+		: undefined
+
+export const createApp = (prisma: PrismaClient) => {
 	const app = new Hono()
+
+	app.use("/*", cors())
+	app.use(logger())
 
 	app.post(
 		"/positions",
-		zValidator("json", positionSchema),
-		(c) => {
-			const position = c.req.valid("json")
-			const result = { ...position, id: positions.length + 1 }
-			positions.push(result)
+		zValidator("json", PositionCreateInputSchema),
+		async (c) => {
+			const data = c.req.valid("json")
+			const result = await prisma.position.create({ data })
 
 			return c.json(result)
 		},
 	)
 	app.patch(
 		"/positions/:id",
-		zValidator("param", z.object({ id: numericSchema })),
-		zValidator("json", positionSchema.omit({ company_id: true })),
-		(c) => c.text("Hello Hono!"),
+		zValidator("param", z.object({ id: NumericSchema })),
+		zValidator("json", PositionUpdateWithoutCompanyInputSchema),
+		async (c) => {
+			const { id } = c.req.valid("param")
+			const data = c.req.valid("json")
+
+			const result = await prisma.position.update({ where: { id }, data })
+
+			return c.json(result)
+		},
 	)
 	app.delete(
 		"/positions/:id",
-		zValidator("param", z.object({ id: numericSchema })),
-		(c) => {
-			const id = c.req.valid("param").id
-			const [removed] = positions.splice(id, 1)
+		zValidator("param", z.object({ id: NumericSchema })),
+		async (c) => {
+			const { id } = c.req.valid("param")
 
-			return c.json(removed)
+			const result = await prisma.position.delete({ where: { id } })
+
+			return c.json(result)
 		},
 	)
 	app.get(
 		"/positions",
-		(c) => c.json(positions),
+		zValidator("query", z.object({ search: z.string().min(2).optional() })),
+		async (c) => {
+			const { search } = c.req.valid("query")
+
+			const result = await prisma.position.findMany({ include, where: fuzzySearch(search) })
+
+			return c.json(result)
+		},
 	)
+
 	app.get(
 		"/positions/:id",
-		zValidator("param", z.object({ id: numericSchema })),
-		(c) => {
+		zValidator("param", z.object({ id: NumericSchema })),
+		async (c) => {
 			const id = c.req.valid("param").id
 
-			return c.json(positions.find((x) => x.id === id))
+			const result = await prisma.position.findUnique({
+				where: { id },
+				include,
+			})
+
+			return result ? c.json(result) : c.notFound()
 		},
 	)
 
 	return app
 }
 
-if (import.meta.main) {
-	const req = new Request(`https://localhost:8080/positions/1`, {
-		method: "DELETE",
-	})
-	const app = createApp()
-	const res = await app.request(req)
-	console.log(res)
-	// Deno.serve(app.fetch)
+if (isMain(import.meta.url)) {
+	const prisma = new PrismaClient({ log: ["query", "info", "warn", "error"] })
+	const app = createApp(prisma)
+
+	showUniqueRoutes(8)(app)
+
+	const server = serve(
+		{ fetch: app.fetch, port: 3000 },
+		({ address, port }) => console.log(`Server listening at ${address}:${port}`),
+	) as Server
+
+	const terminator = createHttpTerminator({ server })
+
+	const events = ["beforeExit", "rejectionHandled", "uncaughtException", "exit"] // list all the process events here...
+	events.forEach((event) =>
+		process.on(event, async (e) => {
+			console.log(`process.on ${event}`, e)
+			await terminator.terminate()
+		})
+	)
 }

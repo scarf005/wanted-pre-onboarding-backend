@@ -20,7 +20,7 @@ export const CompanyScalarFieldEnumSchema = z.enum(['id','name']);
 
 export const TechScalarFieldEnumSchema = z.enum(['id','name']);
 
-export const PositionScalarFieldEnumSchema = z.enum(['id','title','description','reward','companyId','countryId','regionId']);
+export const PositionScalarFieldEnumSchema = z.enum(['id','title','description','reward','companyId','regionId']);
 
 export const SortOrderSchema = z.enum(['asc','desc']);
 
@@ -84,7 +84,6 @@ export const PositionSchema = z.object({
   description: z.string(),
   reward: z.number().int().nullable(),
   companyId: z.number().int(),
-  countryId: z.number().int(),
   regionId: z.number().int(),
 })
 
@@ -99,7 +98,6 @@ export type Position = z.infer<typeof PositionSchema>
 
 export const CountryIncludeSchema: z.ZodType<Prisma.CountryInclude> = z.object({
   regions: z.union([z.boolean(),z.lazy(() => RegionFindManyArgsSchema)]).optional(),
-  Position: z.union([z.boolean(),z.lazy(() => PositionFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => CountryCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -114,14 +112,12 @@ export const CountryCountOutputTypeArgsSchema: z.ZodType<Prisma.CountryCountOutp
 
 export const CountryCountOutputTypeSelectSchema: z.ZodType<Prisma.CountryCountOutputTypeSelect> = z.object({
   regions: z.boolean().optional(),
-  Position: z.boolean().optional(),
 }).strict();
 
 export const CountrySelectSchema: z.ZodType<Prisma.CountrySelect> = z.object({
   id: z.boolean().optional(),
   name: z.boolean().optional(),
   regions: z.union([z.boolean(),z.lazy(() => RegionFindManyArgsSchema)]).optional(),
-  Position: z.union([z.boolean(),z.lazy(() => PositionFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => CountryCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -218,7 +214,6 @@ export const TechSelectSchema: z.ZodType<Prisma.TechSelect> = z.object({
 export const PositionIncludeSchema: z.ZodType<Prisma.PositionInclude> = z.object({
   techStack: z.union([z.boolean(),z.lazy(() => TechFindManyArgsSchema)]).optional(),
   company: z.union([z.boolean(),z.lazy(() => CompanyArgsSchema)]).optional(),
-  country: z.union([z.boolean(),z.lazy(() => CountryArgsSchema)]).optional(),
   region: z.union([z.boolean(),z.lazy(() => RegionArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => PositionCountOutputTypeArgsSchema)]).optional(),
 }).strict()
@@ -242,11 +237,9 @@ export const PositionSelectSchema: z.ZodType<Prisma.PositionSelect> = z.object({
   description: z.boolean().optional(),
   reward: z.boolean().optional(),
   companyId: z.boolean().optional(),
-  countryId: z.boolean().optional(),
   regionId: z.boolean().optional(),
   techStack: z.union([z.boolean(),z.lazy(() => TechFindManyArgsSchema)]).optional(),
   company: z.union([z.boolean(),z.lazy(() => CompanyArgsSchema)]).optional(),
-  country: z.union([z.boolean(),z.lazy(() => CountryArgsSchema)]).optional(),
   region: z.union([z.boolean(),z.lazy(() => RegionArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => PositionCountOutputTypeArgsSchema)]).optional(),
 }).strict()
@@ -262,15 +255,13 @@ export const CountryWhereInputSchema: z.ZodType<Prisma.CountryWhereInput> = z.ob
   NOT: z.union([ z.lazy(() => CountryWhereInputSchema),z.lazy(() => CountryWhereInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  regions: z.lazy(() => RegionListRelationFilterSchema).optional(),
-  Position: z.lazy(() => PositionListRelationFilterSchema).optional()
+  regions: z.lazy(() => RegionListRelationFilterSchema).optional()
 }).strict();
 
 export const CountryOrderByWithRelationInputSchema: z.ZodType<Prisma.CountryOrderByWithRelationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
-  regions: z.lazy(() => RegionOrderByRelationAggregateInputSchema).optional(),
-  Position: z.lazy(() => PositionOrderByRelationAggregateInputSchema).optional()
+  regions: z.lazy(() => RegionOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
 export const CountryWhereUniqueInputSchema: z.ZodType<Prisma.CountryWhereUniqueInput> = z.union([
@@ -291,8 +282,7 @@ export const CountryWhereUniqueInputSchema: z.ZodType<Prisma.CountryWhereUniqueI
   AND: z.union([ z.lazy(() => CountryWhereInputSchema),z.lazy(() => CountryWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => CountryWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => CountryWhereInputSchema),z.lazy(() => CountryWhereInputSchema).array() ]).optional(),
-  regions: z.lazy(() => RegionListRelationFilterSchema).optional(),
-  Position: z.lazy(() => PositionListRelationFilterSchema).optional()
+  regions: z.lazy(() => RegionListRelationFilterSchema).optional()
 }).strict());
 
 export const CountryOrderByWithAggregationInputSchema: z.ZodType<Prisma.CountryOrderByWithAggregationInput> = z.object({
@@ -332,11 +322,21 @@ export const RegionOrderByWithRelationInputSchema: z.ZodType<Prisma.RegionOrderB
   country: z.lazy(() => CountryOrderByWithRelationInputSchema).optional()
 }).strict();
 
-export const RegionWhereUniqueInputSchema: z.ZodType<Prisma.RegionWhereUniqueInput> = z.object({
-  id: z.number().int()
-})
+export const RegionWhereUniqueInputSchema: z.ZodType<Prisma.RegionWhereUniqueInput> = z.union([
+  z.object({
+    id: z.number().int(),
+    name_countryId: z.lazy(() => RegionNameCountryIdCompoundUniqueInputSchema)
+  }),
+  z.object({
+    id: z.number().int(),
+  }),
+  z.object({
+    name_countryId: z.lazy(() => RegionNameCountryIdCompoundUniqueInputSchema),
+  }),
+])
 .and(z.object({
   id: z.number().int().optional(),
+  name_countryId: z.lazy(() => RegionNameCountryIdCompoundUniqueInputSchema).optional(),
   AND: z.union([ z.lazy(() => RegionWhereInputSchema),z.lazy(() => RegionWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => RegionWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => RegionWhereInputSchema),z.lazy(() => RegionWhereInputSchema).array() ]).optional(),
@@ -483,11 +483,9 @@ export const PositionWhereInputSchema: z.ZodType<Prisma.PositionWhereInput> = z.
   description: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   reward: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
   companyId: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
-  countryId: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   regionId: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   techStack: z.lazy(() => TechListRelationFilterSchema).optional(),
   company: z.union([ z.lazy(() => CompanyRelationFilterSchema),z.lazy(() => CompanyWhereInputSchema) ]).optional(),
-  country: z.union([ z.lazy(() => CountryRelationFilterSchema),z.lazy(() => CountryWhereInputSchema) ]).optional(),
   region: z.union([ z.lazy(() => RegionRelationFilterSchema),z.lazy(() => RegionWhereInputSchema) ]).optional(),
 }).strict();
 
@@ -497,19 +495,27 @@ export const PositionOrderByWithRelationInputSchema: z.ZodType<Prisma.PositionOr
   description: z.lazy(() => SortOrderSchema).optional(),
   reward: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   companyId: z.lazy(() => SortOrderSchema).optional(),
-  countryId: z.lazy(() => SortOrderSchema).optional(),
   regionId: z.lazy(() => SortOrderSchema).optional(),
   techStack: z.lazy(() => TechOrderByRelationAggregateInputSchema).optional(),
   company: z.lazy(() => CompanyOrderByWithRelationInputSchema).optional(),
-  country: z.lazy(() => CountryOrderByWithRelationInputSchema).optional(),
   region: z.lazy(() => RegionOrderByWithRelationInputSchema).optional()
 }).strict();
 
-export const PositionWhereUniqueInputSchema: z.ZodType<Prisma.PositionWhereUniqueInput> = z.object({
-  id: z.number().int()
-})
+export const PositionWhereUniqueInputSchema: z.ZodType<Prisma.PositionWhereUniqueInput> = z.union([
+  z.object({
+    id: z.number().int(),
+    title_companyId_regionId: z.lazy(() => PositionTitleCompanyIdRegionIdCompoundUniqueInputSchema)
+  }),
+  z.object({
+    id: z.number().int(),
+  }),
+  z.object({
+    title_companyId_regionId: z.lazy(() => PositionTitleCompanyIdRegionIdCompoundUniqueInputSchema),
+  }),
+])
 .and(z.object({
   id: z.number().int().optional(),
+  title_companyId_regionId: z.lazy(() => PositionTitleCompanyIdRegionIdCompoundUniqueInputSchema).optional(),
   AND: z.union([ z.lazy(() => PositionWhereInputSchema),z.lazy(() => PositionWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => PositionWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => PositionWhereInputSchema),z.lazy(() => PositionWhereInputSchema).array() ]).optional(),
@@ -517,11 +523,9 @@ export const PositionWhereUniqueInputSchema: z.ZodType<Prisma.PositionWhereUniqu
   description: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   reward: z.union([ z.lazy(() => IntNullableFilterSchema),z.number().int() ]).optional().nullable(),
   companyId: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
-  countryId: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
   regionId: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
   techStack: z.lazy(() => TechListRelationFilterSchema).optional(),
   company: z.union([ z.lazy(() => CompanyRelationFilterSchema),z.lazy(() => CompanyWhereInputSchema) ]).optional(),
-  country: z.union([ z.lazy(() => CountryRelationFilterSchema),z.lazy(() => CountryWhereInputSchema) ]).optional(),
   region: z.union([ z.lazy(() => RegionRelationFilterSchema),z.lazy(() => RegionWhereInputSchema) ]).optional(),
 }).strict());
 
@@ -531,7 +535,6 @@ export const PositionOrderByWithAggregationInputSchema: z.ZodType<Prisma.Positio
   description: z.lazy(() => SortOrderSchema).optional(),
   reward: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   companyId: z.lazy(() => SortOrderSchema).optional(),
-  countryId: z.lazy(() => SortOrderSchema).optional(),
   regionId: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => PositionCountOrderByAggregateInputSchema).optional(),
   _avg: z.lazy(() => PositionAvgOrderByAggregateInputSchema).optional(),
@@ -549,34 +552,29 @@ export const PositionScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.Posi
   description: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   reward: z.union([ z.lazy(() => IntNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
   companyId: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
-  countryId: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
   regionId: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
 }).strict();
 
 export const CountryCreateInputSchema: z.ZodType<Prisma.CountryCreateInput> = z.object({
   name: z.string(),
-  regions: z.lazy(() => RegionCreateNestedManyWithoutCountryInputSchema).optional(),
-  Position: z.lazy(() => PositionCreateNestedManyWithoutCountryInputSchema).optional()
+  regions: z.lazy(() => RegionCreateNestedManyWithoutCountryInputSchema).optional()
 }).strict();
 
 export const CountryUncheckedCreateInputSchema: z.ZodType<Prisma.CountryUncheckedCreateInput> = z.object({
   id: z.number().int().optional(),
   name: z.string(),
-  regions: z.lazy(() => RegionUncheckedCreateNestedManyWithoutCountryInputSchema).optional(),
-  Position: z.lazy(() => PositionUncheckedCreateNestedManyWithoutCountryInputSchema).optional()
+  regions: z.lazy(() => RegionUncheckedCreateNestedManyWithoutCountryInputSchema).optional()
 }).strict();
 
 export const CountryUpdateInputSchema: z.ZodType<Prisma.CountryUpdateInput> = z.object({
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  regions: z.lazy(() => RegionUpdateManyWithoutCountryNestedInputSchema).optional(),
-  Position: z.lazy(() => PositionUpdateManyWithoutCountryNestedInputSchema).optional()
+  regions: z.lazy(() => RegionUpdateManyWithoutCountryNestedInputSchema).optional()
 }).strict();
 
 export const CountryUncheckedUpdateInputSchema: z.ZodType<Prisma.CountryUncheckedUpdateInput> = z.object({
   id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  regions: z.lazy(() => RegionUncheckedUpdateManyWithoutCountryNestedInputSchema).optional(),
-  Position: z.lazy(() => PositionUncheckedUpdateManyWithoutCountryNestedInputSchema).optional()
+  regions: z.lazy(() => RegionUncheckedUpdateManyWithoutCountryNestedInputSchema).optional()
 }).strict();
 
 export const CountryUpdateManyMutationInputSchema: z.ZodType<Prisma.CountryUpdateManyMutationInput> = z.object({
@@ -692,7 +690,6 @@ export const PositionCreateInputSchema: z.ZodType<Prisma.PositionCreateInput> = 
   reward: z.number().int().optional().nullable(),
   techStack: z.lazy(() => TechCreateNestedManyWithoutPositionInputSchema).optional(),
   company: z.lazy(() => CompanyCreateNestedOneWithoutPositionInputSchema),
-  country: z.lazy(() => CountryCreateNestedOneWithoutPositionInputSchema),
   region: z.lazy(() => RegionCreateNestedOneWithoutPositionInputSchema)
 }).strict();
 
@@ -702,7 +699,6 @@ export const PositionUncheckedCreateInputSchema: z.ZodType<Prisma.PositionUnchec
   description: z.string(),
   reward: z.number().int().optional().nullable(),
   companyId: z.number().int(),
-  countryId: z.number().int(),
   regionId: z.number().int(),
   techStack: z.lazy(() => TechUncheckedCreateNestedManyWithoutPositionInputSchema).optional()
 }).strict();
@@ -713,7 +709,6 @@ export const PositionUpdateInputSchema: z.ZodType<Prisma.PositionUpdateInput> = 
   reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   techStack: z.lazy(() => TechUpdateManyWithoutPositionNestedInputSchema).optional(),
   company: z.lazy(() => CompanyUpdateOneRequiredWithoutPositionNestedInputSchema).optional(),
-  country: z.lazy(() => CountryUpdateOneRequiredWithoutPositionNestedInputSchema).optional(),
   region: z.lazy(() => RegionUpdateOneRequiredWithoutPositionNestedInputSchema).optional()
 }).strict();
 
@@ -723,7 +718,6 @@ export const PositionUncheckedUpdateInputSchema: z.ZodType<Prisma.PositionUnchec
   description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   companyId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  countryId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   regionId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   techStack: z.lazy(() => TechUncheckedUpdateManyWithoutPositionNestedInputSchema).optional()
 }).strict();
@@ -740,7 +734,6 @@ export const PositionUncheckedUpdateManyInputSchema: z.ZodType<Prisma.PositionUn
   description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   companyId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  countryId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   regionId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
@@ -775,17 +768,7 @@ export const RegionListRelationFilterSchema: z.ZodType<Prisma.RegionListRelation
   none: z.lazy(() => RegionWhereInputSchema).optional()
 }).strict();
 
-export const PositionListRelationFilterSchema: z.ZodType<Prisma.PositionListRelationFilter> = z.object({
-  every: z.lazy(() => PositionWhereInputSchema).optional(),
-  some: z.lazy(() => PositionWhereInputSchema).optional(),
-  none: z.lazy(() => PositionWhereInputSchema).optional()
-}).strict();
-
 export const RegionOrderByRelationAggregateInputSchema: z.ZodType<Prisma.RegionOrderByRelationAggregateInput> = z.object({
-  _count: z.lazy(() => SortOrderSchema).optional()
-}).strict();
-
-export const PositionOrderByRelationAggregateInputSchema: z.ZodType<Prisma.PositionOrderByRelationAggregateInput> = z.object({
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -845,9 +828,24 @@ export const StringWithAggregatesFilterSchema: z.ZodType<Prisma.StringWithAggreg
   _max: z.lazy(() => NestedStringFilterSchema).optional()
 }).strict();
 
+export const PositionListRelationFilterSchema: z.ZodType<Prisma.PositionListRelationFilter> = z.object({
+  every: z.lazy(() => PositionWhereInputSchema).optional(),
+  some: z.lazy(() => PositionWhereInputSchema).optional(),
+  none: z.lazy(() => PositionWhereInputSchema).optional()
+}).strict();
+
 export const CountryRelationFilterSchema: z.ZodType<Prisma.CountryRelationFilter> = z.object({
   is: z.lazy(() => CountryWhereInputSchema).optional(),
   isNot: z.lazy(() => CountryWhereInputSchema).optional()
+}).strict();
+
+export const PositionOrderByRelationAggregateInputSchema: z.ZodType<Prisma.PositionOrderByRelationAggregateInput> = z.object({
+  _count: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const RegionNameCountryIdCompoundUniqueInputSchema: z.ZodType<Prisma.RegionNameCountryIdCompoundUniqueInput> = z.object({
+  name: z.string(),
+  countryId: z.number()
 }).strict();
 
 export const RegionCountOrderByAggregateInputSchema: z.ZodType<Prisma.RegionCountOrderByAggregateInput> = z.object({
@@ -960,13 +958,18 @@ export const TechOrderByRelationAggregateInputSchema: z.ZodType<Prisma.TechOrder
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
+export const PositionTitleCompanyIdRegionIdCompoundUniqueInputSchema: z.ZodType<Prisma.PositionTitleCompanyIdRegionIdCompoundUniqueInput> = z.object({
+  title: z.string(),
+  companyId: z.number(),
+  regionId: z.number()
+}).strict();
+
 export const PositionCountOrderByAggregateInputSchema: z.ZodType<Prisma.PositionCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   title: z.lazy(() => SortOrderSchema).optional(),
   description: z.lazy(() => SortOrderSchema).optional(),
   reward: z.lazy(() => SortOrderSchema).optional(),
   companyId: z.lazy(() => SortOrderSchema).optional(),
-  countryId: z.lazy(() => SortOrderSchema).optional(),
   regionId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -974,7 +977,6 @@ export const PositionAvgOrderByAggregateInputSchema: z.ZodType<Prisma.PositionAv
   id: z.lazy(() => SortOrderSchema).optional(),
   reward: z.lazy(() => SortOrderSchema).optional(),
   companyId: z.lazy(() => SortOrderSchema).optional(),
-  countryId: z.lazy(() => SortOrderSchema).optional(),
   regionId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -984,7 +986,6 @@ export const PositionMaxOrderByAggregateInputSchema: z.ZodType<Prisma.PositionMa
   description: z.lazy(() => SortOrderSchema).optional(),
   reward: z.lazy(() => SortOrderSchema).optional(),
   companyId: z.lazy(() => SortOrderSchema).optional(),
-  countryId: z.lazy(() => SortOrderSchema).optional(),
   regionId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -994,7 +995,6 @@ export const PositionMinOrderByAggregateInputSchema: z.ZodType<Prisma.PositionMi
   description: z.lazy(() => SortOrderSchema).optional(),
   reward: z.lazy(() => SortOrderSchema).optional(),
   companyId: z.lazy(() => SortOrderSchema).optional(),
-  countryId: z.lazy(() => SortOrderSchema).optional(),
   regionId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -1002,7 +1002,6 @@ export const PositionSumOrderByAggregateInputSchema: z.ZodType<Prisma.PositionSu
   id: z.lazy(() => SortOrderSchema).optional(),
   reward: z.lazy(() => SortOrderSchema).optional(),
   companyId: z.lazy(() => SortOrderSchema).optional(),
-  countryId: z.lazy(() => SortOrderSchema).optional(),
   regionId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -1028,22 +1027,10 @@ export const RegionCreateNestedManyWithoutCountryInputSchema: z.ZodType<Prisma.R
   connect: z.union([ z.lazy(() => RegionWhereUniqueInputSchema),z.lazy(() => RegionWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const PositionCreateNestedManyWithoutCountryInputSchema: z.ZodType<Prisma.PositionCreateNestedManyWithoutCountryInput> = z.object({
-  create: z.union([ z.lazy(() => PositionCreateWithoutCountryInputSchema),z.lazy(() => PositionCreateWithoutCountryInputSchema).array(),z.lazy(() => PositionUncheckedCreateWithoutCountryInputSchema),z.lazy(() => PositionUncheckedCreateWithoutCountryInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => PositionCreateOrConnectWithoutCountryInputSchema),z.lazy(() => PositionCreateOrConnectWithoutCountryInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => PositionWhereUniqueInputSchema),z.lazy(() => PositionWhereUniqueInputSchema).array() ]).optional(),
-}).strict();
-
 export const RegionUncheckedCreateNestedManyWithoutCountryInputSchema: z.ZodType<Prisma.RegionUncheckedCreateNestedManyWithoutCountryInput> = z.object({
   create: z.union([ z.lazy(() => RegionCreateWithoutCountryInputSchema),z.lazy(() => RegionCreateWithoutCountryInputSchema).array(),z.lazy(() => RegionUncheckedCreateWithoutCountryInputSchema),z.lazy(() => RegionUncheckedCreateWithoutCountryInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => RegionCreateOrConnectWithoutCountryInputSchema),z.lazy(() => RegionCreateOrConnectWithoutCountryInputSchema).array() ]).optional(),
   connect: z.union([ z.lazy(() => RegionWhereUniqueInputSchema),z.lazy(() => RegionWhereUniqueInputSchema).array() ]).optional(),
-}).strict();
-
-export const PositionUncheckedCreateNestedManyWithoutCountryInputSchema: z.ZodType<Prisma.PositionUncheckedCreateNestedManyWithoutCountryInput> = z.object({
-  create: z.union([ z.lazy(() => PositionCreateWithoutCountryInputSchema),z.lazy(() => PositionCreateWithoutCountryInputSchema).array(),z.lazy(() => PositionUncheckedCreateWithoutCountryInputSchema),z.lazy(() => PositionUncheckedCreateWithoutCountryInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => PositionCreateOrConnectWithoutCountryInputSchema),z.lazy(() => PositionCreateOrConnectWithoutCountryInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => PositionWhereUniqueInputSchema),z.lazy(() => PositionWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
 export const StringFieldUpdateOperationsInputSchema: z.ZodType<Prisma.StringFieldUpdateOperationsInput> = z.object({
@@ -1061,19 +1048,6 @@ export const RegionUpdateManyWithoutCountryNestedInputSchema: z.ZodType<Prisma.R
   update: z.union([ z.lazy(() => RegionUpdateWithWhereUniqueWithoutCountryInputSchema),z.lazy(() => RegionUpdateWithWhereUniqueWithoutCountryInputSchema).array() ]).optional(),
   updateMany: z.union([ z.lazy(() => RegionUpdateManyWithWhereWithoutCountryInputSchema),z.lazy(() => RegionUpdateManyWithWhereWithoutCountryInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => RegionScalarWhereInputSchema),z.lazy(() => RegionScalarWhereInputSchema).array() ]).optional(),
-}).strict();
-
-export const PositionUpdateManyWithoutCountryNestedInputSchema: z.ZodType<Prisma.PositionUpdateManyWithoutCountryNestedInput> = z.object({
-  create: z.union([ z.lazy(() => PositionCreateWithoutCountryInputSchema),z.lazy(() => PositionCreateWithoutCountryInputSchema).array(),z.lazy(() => PositionUncheckedCreateWithoutCountryInputSchema),z.lazy(() => PositionUncheckedCreateWithoutCountryInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => PositionCreateOrConnectWithoutCountryInputSchema),z.lazy(() => PositionCreateOrConnectWithoutCountryInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => PositionUpsertWithWhereUniqueWithoutCountryInputSchema),z.lazy(() => PositionUpsertWithWhereUniqueWithoutCountryInputSchema).array() ]).optional(),
-  set: z.union([ z.lazy(() => PositionWhereUniqueInputSchema),z.lazy(() => PositionWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => PositionWhereUniqueInputSchema),z.lazy(() => PositionWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => PositionWhereUniqueInputSchema),z.lazy(() => PositionWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => PositionWhereUniqueInputSchema),z.lazy(() => PositionWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => PositionUpdateWithWhereUniqueWithoutCountryInputSchema),z.lazy(() => PositionUpdateWithWhereUniqueWithoutCountryInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => PositionUpdateManyWithWhereWithoutCountryInputSchema),z.lazy(() => PositionUpdateManyWithWhereWithoutCountryInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => PositionScalarWhereInputSchema),z.lazy(() => PositionScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const IntFieldUpdateOperationsInputSchema: z.ZodType<Prisma.IntFieldUpdateOperationsInput> = z.object({
@@ -1095,19 +1069,6 @@ export const RegionUncheckedUpdateManyWithoutCountryNestedInputSchema: z.ZodType
   update: z.union([ z.lazy(() => RegionUpdateWithWhereUniqueWithoutCountryInputSchema),z.lazy(() => RegionUpdateWithWhereUniqueWithoutCountryInputSchema).array() ]).optional(),
   updateMany: z.union([ z.lazy(() => RegionUpdateManyWithWhereWithoutCountryInputSchema),z.lazy(() => RegionUpdateManyWithWhereWithoutCountryInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => RegionScalarWhereInputSchema),z.lazy(() => RegionScalarWhereInputSchema).array() ]).optional(),
-}).strict();
-
-export const PositionUncheckedUpdateManyWithoutCountryNestedInputSchema: z.ZodType<Prisma.PositionUncheckedUpdateManyWithoutCountryNestedInput> = z.object({
-  create: z.union([ z.lazy(() => PositionCreateWithoutCountryInputSchema),z.lazy(() => PositionCreateWithoutCountryInputSchema).array(),z.lazy(() => PositionUncheckedCreateWithoutCountryInputSchema),z.lazy(() => PositionUncheckedCreateWithoutCountryInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => PositionCreateOrConnectWithoutCountryInputSchema),z.lazy(() => PositionCreateOrConnectWithoutCountryInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => PositionUpsertWithWhereUniqueWithoutCountryInputSchema),z.lazy(() => PositionUpsertWithWhereUniqueWithoutCountryInputSchema).array() ]).optional(),
-  set: z.union([ z.lazy(() => PositionWhereUniqueInputSchema),z.lazy(() => PositionWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => PositionWhereUniqueInputSchema),z.lazy(() => PositionWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => PositionWhereUniqueInputSchema),z.lazy(() => PositionWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => PositionWhereUniqueInputSchema),z.lazy(() => PositionWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => PositionUpdateWithWhereUniqueWithoutCountryInputSchema),z.lazy(() => PositionUpdateWithWhereUniqueWithoutCountryInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => PositionUpdateManyWithWhereWithoutCountryInputSchema),z.lazy(() => PositionUpdateManyWithWhereWithoutCountryInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => PositionScalarWhereInputSchema),z.lazy(() => PositionScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const PositionCreateNestedManyWithoutRegionInputSchema: z.ZodType<Prisma.PositionCreateNestedManyWithoutRegionInput> = z.object({
@@ -1250,12 +1211,6 @@ export const CompanyCreateNestedOneWithoutPositionInputSchema: z.ZodType<Prisma.
   connect: z.lazy(() => CompanyWhereUniqueInputSchema).optional()
 }).strict();
 
-export const CountryCreateNestedOneWithoutPositionInputSchema: z.ZodType<Prisma.CountryCreateNestedOneWithoutPositionInput> = z.object({
-  create: z.union([ z.lazy(() => CountryCreateWithoutPositionInputSchema),z.lazy(() => CountryUncheckedCreateWithoutPositionInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => CountryCreateOrConnectWithoutPositionInputSchema).optional(),
-  connect: z.lazy(() => CountryWhereUniqueInputSchema).optional()
-}).strict();
-
 export const RegionCreateNestedOneWithoutPositionInputSchema: z.ZodType<Prisma.RegionCreateNestedOneWithoutPositionInput> = z.object({
   create: z.union([ z.lazy(() => RegionCreateWithoutPositionInputSchema),z.lazy(() => RegionUncheckedCreateWithoutPositionInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => RegionCreateOrConnectWithoutPositionInputSchema).optional(),
@@ -1295,14 +1250,6 @@ export const CompanyUpdateOneRequiredWithoutPositionNestedInputSchema: z.ZodType
   upsert: z.lazy(() => CompanyUpsertWithoutPositionInputSchema).optional(),
   connect: z.lazy(() => CompanyWhereUniqueInputSchema).optional(),
   update: z.union([ z.lazy(() => CompanyUpdateToOneWithWhereWithoutPositionInputSchema),z.lazy(() => CompanyUpdateWithoutPositionInputSchema),z.lazy(() => CompanyUncheckedUpdateWithoutPositionInputSchema) ]).optional(),
-}).strict();
-
-export const CountryUpdateOneRequiredWithoutPositionNestedInputSchema: z.ZodType<Prisma.CountryUpdateOneRequiredWithoutPositionNestedInput> = z.object({
-  create: z.union([ z.lazy(() => CountryCreateWithoutPositionInputSchema),z.lazy(() => CountryUncheckedCreateWithoutPositionInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => CountryCreateOrConnectWithoutPositionInputSchema).optional(),
-  upsert: z.lazy(() => CountryUpsertWithoutPositionInputSchema).optional(),
-  connect: z.lazy(() => CountryWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => CountryUpdateToOneWithWhereWithoutPositionInputSchema),z.lazy(() => CountryUpdateWithoutPositionInputSchema),z.lazy(() => CountryUncheckedUpdateWithoutPositionInputSchema) ]).optional(),
 }).strict();
 
 export const RegionUpdateOneRequiredWithoutPositionNestedInputSchema: z.ZodType<Prisma.RegionUpdateOneRequiredWithoutPositionNestedInput> = z.object({
@@ -1449,30 +1396,6 @@ export const RegionCreateOrConnectWithoutCountryInputSchema: z.ZodType<Prisma.Re
   create: z.union([ z.lazy(() => RegionCreateWithoutCountryInputSchema),z.lazy(() => RegionUncheckedCreateWithoutCountryInputSchema) ]),
 }).strict();
 
-export const PositionCreateWithoutCountryInputSchema: z.ZodType<Prisma.PositionCreateWithoutCountryInput> = z.object({
-  title: z.string(),
-  description: z.string(),
-  reward: z.number().int().optional().nullable(),
-  techStack: z.lazy(() => TechCreateNestedManyWithoutPositionInputSchema).optional(),
-  company: z.lazy(() => CompanyCreateNestedOneWithoutPositionInputSchema),
-  region: z.lazy(() => RegionCreateNestedOneWithoutPositionInputSchema)
-}).strict();
-
-export const PositionUncheckedCreateWithoutCountryInputSchema: z.ZodType<Prisma.PositionUncheckedCreateWithoutCountryInput> = z.object({
-  id: z.number().int().optional(),
-  title: z.string(),
-  description: z.string(),
-  reward: z.number().int().optional().nullable(),
-  companyId: z.number().int(),
-  regionId: z.number().int(),
-  techStack: z.lazy(() => TechUncheckedCreateNestedManyWithoutPositionInputSchema).optional()
-}).strict();
-
-export const PositionCreateOrConnectWithoutCountryInputSchema: z.ZodType<Prisma.PositionCreateOrConnectWithoutCountryInput> = z.object({
-  where: z.lazy(() => PositionWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => PositionCreateWithoutCountryInputSchema),z.lazy(() => PositionUncheckedCreateWithoutCountryInputSchema) ]),
-}).strict();
-
 export const RegionUpsertWithWhereUniqueWithoutCountryInputSchema: z.ZodType<Prisma.RegionUpsertWithWhereUniqueWithoutCountryInput> = z.object({
   where: z.lazy(() => RegionWhereUniqueInputSchema),
   update: z.union([ z.lazy(() => RegionUpdateWithoutCountryInputSchema),z.lazy(() => RegionUncheckedUpdateWithoutCountryInputSchema) ]),
@@ -1498,42 +1421,12 @@ export const RegionScalarWhereInputSchema: z.ZodType<Prisma.RegionScalarWhereInp
   countryId: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
 }).strict();
 
-export const PositionUpsertWithWhereUniqueWithoutCountryInputSchema: z.ZodType<Prisma.PositionUpsertWithWhereUniqueWithoutCountryInput> = z.object({
-  where: z.lazy(() => PositionWhereUniqueInputSchema),
-  update: z.union([ z.lazy(() => PositionUpdateWithoutCountryInputSchema),z.lazy(() => PositionUncheckedUpdateWithoutCountryInputSchema) ]),
-  create: z.union([ z.lazy(() => PositionCreateWithoutCountryInputSchema),z.lazy(() => PositionUncheckedCreateWithoutCountryInputSchema) ]),
-}).strict();
-
-export const PositionUpdateWithWhereUniqueWithoutCountryInputSchema: z.ZodType<Prisma.PositionUpdateWithWhereUniqueWithoutCountryInput> = z.object({
-  where: z.lazy(() => PositionWhereUniqueInputSchema),
-  data: z.union([ z.lazy(() => PositionUpdateWithoutCountryInputSchema),z.lazy(() => PositionUncheckedUpdateWithoutCountryInputSchema) ]),
-}).strict();
-
-export const PositionUpdateManyWithWhereWithoutCountryInputSchema: z.ZodType<Prisma.PositionUpdateManyWithWhereWithoutCountryInput> = z.object({
-  where: z.lazy(() => PositionScalarWhereInputSchema),
-  data: z.union([ z.lazy(() => PositionUpdateManyMutationInputSchema),z.lazy(() => PositionUncheckedUpdateManyWithoutCountryInputSchema) ]),
-}).strict();
-
-export const PositionScalarWhereInputSchema: z.ZodType<Prisma.PositionScalarWhereInput> = z.object({
-  AND: z.union([ z.lazy(() => PositionScalarWhereInputSchema),z.lazy(() => PositionScalarWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => PositionScalarWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => PositionScalarWhereInputSchema),z.lazy(() => PositionScalarWhereInputSchema).array() ]).optional(),
-  id: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
-  title: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  description: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  reward: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
-  companyId: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
-  countryId: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
-  regionId: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
-}).strict();
-
 export const PositionCreateWithoutRegionInputSchema: z.ZodType<Prisma.PositionCreateWithoutRegionInput> = z.object({
   title: z.string(),
   description: z.string(),
   reward: z.number().int().optional().nullable(),
   techStack: z.lazy(() => TechCreateNestedManyWithoutPositionInputSchema).optional(),
-  company: z.lazy(() => CompanyCreateNestedOneWithoutPositionInputSchema),
-  country: z.lazy(() => CountryCreateNestedOneWithoutPositionInputSchema)
+  company: z.lazy(() => CompanyCreateNestedOneWithoutPositionInputSchema)
 }).strict();
 
 export const PositionUncheckedCreateWithoutRegionInputSchema: z.ZodType<Prisma.PositionUncheckedCreateWithoutRegionInput> = z.object({
@@ -1542,7 +1435,6 @@ export const PositionUncheckedCreateWithoutRegionInputSchema: z.ZodType<Prisma.P
   description: z.string(),
   reward: z.number().int().optional().nullable(),
   companyId: z.number().int(),
-  countryId: z.number().int(),
   techStack: z.lazy(() => TechUncheckedCreateNestedManyWithoutPositionInputSchema).optional()
 }).strict();
 
@@ -1552,14 +1444,12 @@ export const PositionCreateOrConnectWithoutRegionInputSchema: z.ZodType<Prisma.P
 }).strict();
 
 export const CountryCreateWithoutRegionsInputSchema: z.ZodType<Prisma.CountryCreateWithoutRegionsInput> = z.object({
-  name: z.string(),
-  Position: z.lazy(() => PositionCreateNestedManyWithoutCountryInputSchema).optional()
+  name: z.string()
 }).strict();
 
 export const CountryUncheckedCreateWithoutRegionsInputSchema: z.ZodType<Prisma.CountryUncheckedCreateWithoutRegionsInput> = z.object({
   id: z.number().int().optional(),
-  name: z.string(),
-  Position: z.lazy(() => PositionUncheckedCreateNestedManyWithoutCountryInputSchema).optional()
+  name: z.string()
 }).strict();
 
 export const CountryCreateOrConnectWithoutRegionsInputSchema: z.ZodType<Prisma.CountryCreateOrConnectWithoutRegionsInput> = z.object({
@@ -1583,6 +1473,18 @@ export const PositionUpdateManyWithWhereWithoutRegionInputSchema: z.ZodType<Pris
   data: z.union([ z.lazy(() => PositionUpdateManyMutationInputSchema),z.lazy(() => PositionUncheckedUpdateManyWithoutRegionInputSchema) ]),
 }).strict();
 
+export const PositionScalarWhereInputSchema: z.ZodType<Prisma.PositionScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => PositionScalarWhereInputSchema),z.lazy(() => PositionScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => PositionScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => PositionScalarWhereInputSchema),z.lazy(() => PositionScalarWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
+  title: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  description: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  reward: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
+  companyId: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
+  regionId: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
+}).strict();
+
 export const CountryUpsertWithoutRegionsInputSchema: z.ZodType<Prisma.CountryUpsertWithoutRegionsInput> = z.object({
   update: z.union([ z.lazy(() => CountryUpdateWithoutRegionsInputSchema),z.lazy(() => CountryUncheckedUpdateWithoutRegionsInputSchema) ]),
   create: z.union([ z.lazy(() => CountryCreateWithoutRegionsInputSchema),z.lazy(() => CountryUncheckedCreateWithoutRegionsInputSchema) ]),
@@ -1596,13 +1498,11 @@ export const CountryUpdateToOneWithWhereWithoutRegionsInputSchema: z.ZodType<Pri
 
 export const CountryUpdateWithoutRegionsInputSchema: z.ZodType<Prisma.CountryUpdateWithoutRegionsInput> = z.object({
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  Position: z.lazy(() => PositionUpdateManyWithoutCountryNestedInputSchema).optional()
 }).strict();
 
 export const CountryUncheckedUpdateWithoutRegionsInputSchema: z.ZodType<Prisma.CountryUncheckedUpdateWithoutRegionsInput> = z.object({
   id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  Position: z.lazy(() => PositionUncheckedUpdateManyWithoutCountryNestedInputSchema).optional()
 }).strict();
 
 export const PositionCreateWithoutCompanyInputSchema: z.ZodType<Prisma.PositionCreateWithoutCompanyInput> = z.object({
@@ -1610,7 +1510,6 @@ export const PositionCreateWithoutCompanyInputSchema: z.ZodType<Prisma.PositionC
   description: z.string(),
   reward: z.number().int().optional().nullable(),
   techStack: z.lazy(() => TechCreateNestedManyWithoutPositionInputSchema).optional(),
-  country: z.lazy(() => CountryCreateNestedOneWithoutPositionInputSchema),
   region: z.lazy(() => RegionCreateNestedOneWithoutPositionInputSchema)
 }).strict();
 
@@ -1619,7 +1518,6 @@ export const PositionUncheckedCreateWithoutCompanyInputSchema: z.ZodType<Prisma.
   title: z.string(),
   description: z.string(),
   reward: z.number().int().optional().nullable(),
-  countryId: z.number().int(),
   regionId: z.number().int(),
   techStack: z.lazy(() => TechUncheckedCreateNestedManyWithoutPositionInputSchema).optional()
 }).strict();
@@ -1650,7 +1548,6 @@ export const PositionCreateWithoutTechStackInputSchema: z.ZodType<Prisma.Positio
   description: z.string(),
   reward: z.number().int().optional().nullable(),
   company: z.lazy(() => CompanyCreateNestedOneWithoutPositionInputSchema),
-  country: z.lazy(() => CountryCreateNestedOneWithoutPositionInputSchema),
   region: z.lazy(() => RegionCreateNestedOneWithoutPositionInputSchema)
 }).strict();
 
@@ -1660,7 +1557,6 @@ export const PositionUncheckedCreateWithoutTechStackInputSchema: z.ZodType<Prism
   description: z.string(),
   reward: z.number().int().optional().nullable(),
   companyId: z.number().int(),
-  countryId: z.number().int(),
   regionId: z.number().int()
 }).strict();
 
@@ -1711,22 +1607,6 @@ export const CompanyUncheckedCreateWithoutPositionInputSchema: z.ZodType<Prisma.
 export const CompanyCreateOrConnectWithoutPositionInputSchema: z.ZodType<Prisma.CompanyCreateOrConnectWithoutPositionInput> = z.object({
   where: z.lazy(() => CompanyWhereUniqueInputSchema),
   create: z.union([ z.lazy(() => CompanyCreateWithoutPositionInputSchema),z.lazy(() => CompanyUncheckedCreateWithoutPositionInputSchema) ]),
-}).strict();
-
-export const CountryCreateWithoutPositionInputSchema: z.ZodType<Prisma.CountryCreateWithoutPositionInput> = z.object({
-  name: z.string(),
-  regions: z.lazy(() => RegionCreateNestedManyWithoutCountryInputSchema).optional()
-}).strict();
-
-export const CountryUncheckedCreateWithoutPositionInputSchema: z.ZodType<Prisma.CountryUncheckedCreateWithoutPositionInput> = z.object({
-  id: z.number().int().optional(),
-  name: z.string(),
-  regions: z.lazy(() => RegionUncheckedCreateNestedManyWithoutCountryInputSchema).optional()
-}).strict();
-
-export const CountryCreateOrConnectWithoutPositionInputSchema: z.ZodType<Prisma.CountryCreateOrConnectWithoutPositionInput> = z.object({
-  where: z.lazy(() => CountryWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => CountryCreateWithoutPositionInputSchema),z.lazy(() => CountryUncheckedCreateWithoutPositionInputSchema) ]),
 }).strict();
 
 export const RegionCreateWithoutPositionInputSchema: z.ZodType<Prisma.RegionCreateWithoutPositionInput> = z.object({
@@ -1789,28 +1669,6 @@ export const CompanyUncheckedUpdateWithoutPositionInputSchema: z.ZodType<Prisma.
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const CountryUpsertWithoutPositionInputSchema: z.ZodType<Prisma.CountryUpsertWithoutPositionInput> = z.object({
-  update: z.union([ z.lazy(() => CountryUpdateWithoutPositionInputSchema),z.lazy(() => CountryUncheckedUpdateWithoutPositionInputSchema) ]),
-  create: z.union([ z.lazy(() => CountryCreateWithoutPositionInputSchema),z.lazy(() => CountryUncheckedCreateWithoutPositionInputSchema) ]),
-  where: z.lazy(() => CountryWhereInputSchema).optional()
-}).strict();
-
-export const CountryUpdateToOneWithWhereWithoutPositionInputSchema: z.ZodType<Prisma.CountryUpdateToOneWithWhereWithoutPositionInput> = z.object({
-  where: z.lazy(() => CountryWhereInputSchema).optional(),
-  data: z.union([ z.lazy(() => CountryUpdateWithoutPositionInputSchema),z.lazy(() => CountryUncheckedUpdateWithoutPositionInputSchema) ]),
-}).strict();
-
-export const CountryUpdateWithoutPositionInputSchema: z.ZodType<Prisma.CountryUpdateWithoutPositionInput> = z.object({
-  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  regions: z.lazy(() => RegionUpdateManyWithoutCountryNestedInputSchema).optional()
-}).strict();
-
-export const CountryUncheckedUpdateWithoutPositionInputSchema: z.ZodType<Prisma.CountryUncheckedUpdateWithoutPositionInput> = z.object({
-  id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  regions: z.lazy(() => RegionUncheckedUpdateManyWithoutCountryNestedInputSchema).optional()
-}).strict();
-
 export const RegionUpsertWithoutPositionInputSchema: z.ZodType<Prisma.RegionUpsertWithoutPositionInput> = z.object({
   update: z.union([ z.lazy(() => RegionUpdateWithoutPositionInputSchema),z.lazy(() => RegionUncheckedUpdateWithoutPositionInputSchema) ]),
   create: z.union([ z.lazy(() => RegionCreateWithoutPositionInputSchema),z.lazy(() => RegionUncheckedCreateWithoutPositionInputSchema) ]),
@@ -1849,41 +1707,12 @@ export const RegionUncheckedUpdateManyWithoutCountryInputSchema: z.ZodType<Prism
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const PositionUpdateWithoutCountryInputSchema: z.ZodType<Prisma.PositionUpdateWithoutCountryInput> = z.object({
-  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  techStack: z.lazy(() => TechUpdateManyWithoutPositionNestedInputSchema).optional(),
-  company: z.lazy(() => CompanyUpdateOneRequiredWithoutPositionNestedInputSchema).optional(),
-  region: z.lazy(() => RegionUpdateOneRequiredWithoutPositionNestedInputSchema).optional()
-}).strict();
-
-export const PositionUncheckedUpdateWithoutCountryInputSchema: z.ZodType<Prisma.PositionUncheckedUpdateWithoutCountryInput> = z.object({
-  id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  companyId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  regionId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  techStack: z.lazy(() => TechUncheckedUpdateManyWithoutPositionNestedInputSchema).optional()
-}).strict();
-
-export const PositionUncheckedUpdateManyWithoutCountryInputSchema: z.ZodType<Prisma.PositionUncheckedUpdateManyWithoutCountryInput> = z.object({
-  id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  companyId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  regionId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-}).strict();
-
 export const PositionUpdateWithoutRegionInputSchema: z.ZodType<Prisma.PositionUpdateWithoutRegionInput> = z.object({
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   techStack: z.lazy(() => TechUpdateManyWithoutPositionNestedInputSchema).optional(),
-  company: z.lazy(() => CompanyUpdateOneRequiredWithoutPositionNestedInputSchema).optional(),
-  country: z.lazy(() => CountryUpdateOneRequiredWithoutPositionNestedInputSchema).optional()
+  company: z.lazy(() => CompanyUpdateOneRequiredWithoutPositionNestedInputSchema).optional()
 }).strict();
 
 export const PositionUncheckedUpdateWithoutRegionInputSchema: z.ZodType<Prisma.PositionUncheckedUpdateWithoutRegionInput> = z.object({
@@ -1892,7 +1721,6 @@ export const PositionUncheckedUpdateWithoutRegionInputSchema: z.ZodType<Prisma.P
   description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   companyId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  countryId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   techStack: z.lazy(() => TechUncheckedUpdateManyWithoutPositionNestedInputSchema).optional()
 }).strict();
 
@@ -1902,7 +1730,6 @@ export const PositionUncheckedUpdateManyWithoutRegionInputSchema: z.ZodType<Pris
   description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   companyId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  countryId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const PositionUpdateWithoutCompanyInputSchema: z.ZodType<Prisma.PositionUpdateWithoutCompanyInput> = z.object({
@@ -1910,7 +1737,6 @@ export const PositionUpdateWithoutCompanyInputSchema: z.ZodType<Prisma.PositionU
   description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   techStack: z.lazy(() => TechUpdateManyWithoutPositionNestedInputSchema).optional(),
-  country: z.lazy(() => CountryUpdateOneRequiredWithoutPositionNestedInputSchema).optional(),
   region: z.lazy(() => RegionUpdateOneRequiredWithoutPositionNestedInputSchema).optional()
 }).strict();
 
@@ -1919,7 +1745,6 @@ export const PositionUncheckedUpdateWithoutCompanyInputSchema: z.ZodType<Prisma.
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  countryId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   regionId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   techStack: z.lazy(() => TechUncheckedUpdateManyWithoutPositionNestedInputSchema).optional()
 }).strict();
@@ -1929,7 +1754,6 @@ export const PositionUncheckedUpdateManyWithoutCompanyInputSchema: z.ZodType<Pri
   title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  countryId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   regionId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
@@ -1938,7 +1762,6 @@ export const PositionUpdateWithoutTechStackInputSchema: z.ZodType<Prisma.Positio
   description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   company: z.lazy(() => CompanyUpdateOneRequiredWithoutPositionNestedInputSchema).optional(),
-  country: z.lazy(() => CountryUpdateOneRequiredWithoutPositionNestedInputSchema).optional(),
   region: z.lazy(() => RegionUpdateOneRequiredWithoutPositionNestedInputSchema).optional()
 }).strict();
 
@@ -1948,7 +1771,6 @@ export const PositionUncheckedUpdateWithoutTechStackInputSchema: z.ZodType<Prism
   description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   companyId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  countryId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   regionId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
@@ -1958,7 +1780,6 @@ export const PositionUncheckedUpdateManyWithoutTechStackInputSchema: z.ZodType<P
   description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   reward: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   companyId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  countryId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   regionId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 

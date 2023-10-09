@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.203.0/assert/mod.ts"
-import { createApp } from "./main.ts"
+import { createApp } from "./app.ts"
 import type { PositionReq } from "./data.ts"
 import { assertObjectMatch } from "https://deno.land/std@0.203.0/assert/assert_object_match.ts"
 
@@ -34,7 +34,10 @@ Deno.test("POST /positions", async (t) => {
 			reward: 1500000,
 		}
 
-		const req = new Request(`${url}/positions`, { method: "POST", body: JSON.stringify(position) })
+		const req = new Request(`${url}/positions`, {
+			method: "POST",
+			body: JSON.stringify(position),
+		})
 		const res = await app.request(req)
 
 		assertEquals(res.status, 200)
