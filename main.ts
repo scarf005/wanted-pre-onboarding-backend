@@ -17,11 +17,14 @@ import { Server } from "node:http"
 import { showUniqueRoutes } from "./unique_routes.ts"
 import { isMain } from "./is_main.ts"
 
-const include = {
-	company: true,
-	region: { include: { country: true } },
+const select = {
+	id: true,
+	title: true,
+	reward: true,
 	techStack: true,
-} satisfies Prisma.PositionInclude
+	company: true,
+	region: true,
+} satisfies Prisma.PositionSelect
 
 const fuzzySearch = (search?: string) =>
 	search
@@ -81,7 +84,7 @@ export const createApp = (prisma: PrismaClient) => {
 		async (c) => {
 			const { search } = c.req.valid("query")
 
-			const result = await prisma.position.findMany({ include, where: fuzzySearch(search) })
+			const result = await prisma.position.findMany({ select, where: fuzzySearch(search) })
 
 			return c.json(result)
 		},
@@ -95,10 +98,14 @@ export const createApp = (prisma: PrismaClient) => {
 
 			const result = await prisma.position.findUnique({
 				where: { id },
-				include,
+				select: { ...select, description: true },
+			})
+			const otherPositions = await prisma.position.findMany({
+				where: { company: { id: result?.company.id }, NOT: { id: result?.id } },
+				select: { id: true },
 			})
 
-			return result ? c.json(result) : c.notFound()
+			return result ? c.json({ ...result, otherPositions }) : c.notFound()
 		},
 	)
 
