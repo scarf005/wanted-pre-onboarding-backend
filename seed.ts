@@ -1,9 +1,9 @@
-import { Prisma, PrismaClient } from "@prisma/client"
-import { fileURLToPath } from "node:url"
+import { PrismaClient } from "@prisma/client"
 import { isMain } from "./is_main"
 
 const titles = {
-	wanted: "주니어 백엔드 개발자",
+	wantedBackend: "주니어 백엔드 개발자",
+    wantedFrontend: "주니어 프론트엔드 개발자",
 	naver: "Django 백엔드 개발자",
 } as const
 
@@ -15,12 +15,16 @@ const techs = {
 	typescript: "Typescript",
 } as const
 
+const upsertWith = (name: string) => ({ where: { name }, create: { name }, update: {} })
+const upsertTech = (prisma: PrismaClient) => (name: string) => prisma.tech.upsert(upsertWith(name))
+
+const upsertCompany = (prisma: PrismaClient) => (name: string) =>
+	prisma.company.upsert(upsertWith(name))
+
+export const seedTechs = (prisma: PrismaClient) => async (techs: string[]) =>
+	await prisma.$transaction(techs.map(upsertTech(prisma)))
+
 export const seed = async (prisma: PrismaClient) => {
-	const upsertWith = (name: string) => ({ where: { name }, create: { name }, update: {} })
-
-	const upsertTech = (name: string) => prisma.tech.upsert(upsertWith(name))
-	const upsertCompany = (name: string) => prisma.company.upsert(upsertWith(name))
-
 	const korea = await prisma.country.upsert({
 		where: { name: "한국" },
 		create: { name: "한국" },
@@ -39,26 +43,45 @@ export const seed = async (prisma: PrismaClient) => {
 		update: {},
 	})
 
-	const wantedlab = await upsertCompany("원티드랩")
-	const naver = await upsertCompany("네이버")
+	const wantedlab = await upsertCompany(prisma)("원티드랩")
+	const naver = await upsertCompany(prisma)("네이버")
 
-	await prisma.$transaction(Object.values(techs).map(upsertTech))
+	await seedTechs(prisma)(Object.values(techs))
 
 	const wantedBackend = await prisma.position.upsert({
 		update: {},
 		where: {
 			title_companyId_regionId: {
-				title: titles.wanted,
+				title: titles.wantedBackend,
 				companyId: wantedlab.id,
 				regionId: seoul.id,
 			},
 		},
 		create: {
-			title: titles.wanted,
+			title: titles.wantedBackend,
 			description: "원티드랩에서 백엔드 주니어 개발자를 채용합니다. 자격요건은..",
 			reward: 1500000,
 			techStack: { connect: [{ name: techs.typescript }, { name: techs.postgresql }] },
-			company: { connect: { id: wantedlab.id } },
+			company: { connect: { name: wantedlab.name } },
+			region: { connect: { id: seoul.id } },
+		},
+	})
+
+	const wantedFrontend = await prisma.position.upsert({
+		update: {},
+		where: {
+			title_companyId_regionId: {
+				title: titles.wantedFrontend,
+				companyId: wantedlab.id,
+				regionId: seoul.id,
+			},
+		},
+		create: {
+			title: titles.wantedFrontend,
+			description: "원티드랩에서 프론트엔드 주니어 개발자를 채용합니다. 자격요건은..",
+			reward: 1500000,
+			techStack: { connect: [{ name: techs.typescript }, { name: techs.postgresql }] },
+			company: { connect: { name: wantedlab.name } },
 			region: { connect: { id: seoul.id } },
 		},
 	})
@@ -83,7 +106,7 @@ export const seed = async (prisma: PrismaClient) => {
 			region: { connect: { id: pangyo.id } },
 		},
 	})
-	return { wantedBackend, naverBackend }
+	return { wantedBackend, wantedFrontend, naverBackend }
 }
 
 if (isMain(import.meta.url)) {

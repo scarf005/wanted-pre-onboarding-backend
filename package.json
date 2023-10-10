@@ -5,13 +5,15 @@
 	"description": "",
 	"type": "module",
 	"scripts": {
-		"dev": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm --watch main.ts"
+		"dev": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm --watch main.ts",
+		"test": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm --test main_test.ts",
+		"test:watch": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm --test --watch main_test.ts"
 	},
 	"prisma": {
 		"seed": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm seed.ts"
 	},
 	"engines": {
-		"node": "18.16.1"
+		"node": ">=20.8.0"
 	},
 	"author": "scarf",
 	"license": "AGPL-3.0-only",
@@ -21,13 +23,13 @@
 		"@prisma/client": "^5.4.1",
 		"hono": "^3.7.5",
 		"http-terminator": "^3.2.0",
-		"zod": "^3.22.4",
-		"zod-prisma-types": "^2.7.9"
+		"zod": "^3.22.4"
 	},
 	"devDependencies": {
 		"@swc-node/register": "^1.6.8",
 		"@types/node": "^20.8.3",
 		"prisma": "^5.4.1",
-		"typescript": "^5.2.2"
+		"typescript": "^5.2.2",
+		"zod-prisma-types": "^2.7.9"
 	}
 }

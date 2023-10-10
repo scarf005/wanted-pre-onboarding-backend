@@ -38,12 +38,8 @@ const fuzzySearch = (search?: string) =>
 		} satisfies Prisma.PositionWhereInput)
 		: undefined
 
-export const createApp = (prisma: PrismaClient) => {
-	const app = new Hono()
-
-	app.use("/*", cors())
-	app.use(logger())
-
+type Option = { prisma: PrismaClient; app: Hono }
+export const createApp = ({ prisma, app }: Option) => {
 	app.post(
 		"/positions",
 		zValidator("json", PositionCreateInputSchema),
@@ -51,7 +47,7 @@ export const createApp = (prisma: PrismaClient) => {
 			const data = c.req.valid("json")
 			const result = await prisma.position.create({ data })
 
-			return c.json(result)
+			return c.jsonT(result)
 		},
 	)
 	app.patch(
@@ -64,7 +60,7 @@ export const createApp = (prisma: PrismaClient) => {
 
 			const result = await prisma.position.update({ where: { id }, data })
 
-			return c.json(result)
+			return c.jsonT(result)
 		},
 	)
 	app.delete(
@@ -75,7 +71,7 @@ export const createApp = (prisma: PrismaClient) => {
 
 			const result = await prisma.position.delete({ where: { id } })
 
-			return c.json(result)
+			return c.jsonT(result)
 		},
 	)
 	app.get(
@@ -86,10 +82,9 @@ export const createApp = (prisma: PrismaClient) => {
 
 			const result = await prisma.position.findMany({ select, where: fuzzySearch(search) })
 
-			return c.json(result)
+			return c.jsonT(result)
 		},
 	)
-
 	app.get(
 		"/positions/:id",
 		zValidator("param", z.object({ id: NumericSchema })),
@@ -105,7 +100,7 @@ export const createApp = (prisma: PrismaClient) => {
 				select: { id: true },
 			})
 
-			return result ? c.json({ ...result, otherPositions }) : c.notFound()
+			return result ? c.jsonT({ ...result, otherPositions }) : c.notFound()
 		},
 	)
 
@@ -113,8 +108,9 @@ export const createApp = (prisma: PrismaClient) => {
 }
 
 if (isMain(import.meta.url)) {
-	const prisma = new PrismaClient({ log: ["query", "info", "warn", "error"] })
-	const app = createApp(prisma)
+	const prisma = new PrismaClient()
+	const hono = new Hono().use(logger()).use("/*", cors())
+	const app = createApp({ prisma, app: hono })
 
 	showUniqueRoutes(8)(app)
 

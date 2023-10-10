@@ -1,9 +1,6 @@
 services:
-  web:
-    image: node:slim
-
   sqlite3:
-    image: nouchka/sqlite3:latest
+    image: keinos/sqlite3
     stdin_open: true
     tty: true
     volumes:
