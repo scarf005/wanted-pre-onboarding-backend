@@ -6,8 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm --watch main.ts",
-		"test": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm --test main_test.ts",
-		"test:watch": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm --test --watch main_test.ts"
+		"test": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm --test get_test.ts post_test.ts"
 	},
 	"prisma": {
 		"seed": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm seed.ts"

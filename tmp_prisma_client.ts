@@ -42,12 +42,16 @@ export const tmpPrismaClient = async (
 	dbUrl: url.URL,
 	{ silent }: Option = { silent: false },
 ): Promise<{ prisma: PrismaClient } & AsyncDisposable> => {
-	const log = silent ? () => {} : console.debug
+    const log = silent ? () => {} : console.debug
 
+    const now = performance.now()
 	await migratePrisma(dbUrl)
+    const migrate = performance.now()
+    log(`migrated prisma client ${dbUrl} in ${(migrate - now).toFixed()}ms`)
 
 	const prisma = new PrismaClient({ datasourceUrl: dbUrl.toString() })
-	log(`connected prisma client ${dbUrl}`)
+    const connect = performance.now()
+	log(`connected prisma client ${dbUrl} in ${(connect - migrate).toFixed()}ms`)
 
 	return {
 		prisma,

@@ -3,7 +3,7 @@ import { isMain } from "./is_main"
 
 const titles = {
 	wantedBackend: "주니어 백엔드 개발자",
-    wantedFrontend: "주니어 프론트엔드 개발자",
+	wantedFrontend: "주니어 프론트엔드 개발자",
 	naver: "Django 백엔드 개발자",
 } as const
 
@@ -25,30 +25,34 @@ export const seedTechs = (prisma: PrismaClient) => async (techs: string[]) =>
 	await prisma.$transaction(techs.map(upsertTech(prisma)))
 
 export const seed = async (prisma: PrismaClient) => {
+    const now = performance.now()
 	const korea = await prisma.country.upsert({
 		where: { name: "한국" },
 		create: { name: "한국" },
 		update: {},
 	})
+    console.log(`upserted country in ${(performance.now() - now).toFixed()}ms`)
+	const [seoul, pangyo] = await prisma.$transaction([
+		prisma.region.upsert({
+			where: { name_countryId: { countryId: korea.id, name: "서울" } },
+			create: { name: "서울", country: { connect: { id: korea.id } } },
+			update: {},
+		}),
+		prisma.region.upsert({
+			where: { name_countryId: { countryId: korea.id, name: "판교" } },
+			create: { name: "판교", country: { connect: { id: korea.id } } },
+			update: {},
+		}),
+	])
+    console.log(`upserted regions in ${(performance.now() - now).toFixed()}ms`)
 
-	const seoul = await prisma.region.upsert({
-		where: { name_countryId: { countryId: korea.id, name: "서울" } },
-		create: { name: "서울", country: { connect: { id: korea.id } } },
-		update: {},
-	})
+	const [wantedlab, naver] = await prisma.$transaction([
+		...["원티드랩", "네이버"].map(upsertCompany(prisma)),
+		...Object.values(techs).map(upsertTech(prisma)),
+	])
+    console.log(`upserted companies and techs in ${(performance.now() - now).toFixed()}ms`)
 
-	const pangyo = await prisma.region.upsert({
-		where: { name_countryId: { countryId: korea.id, name: "판교" } },
-		create: { name: "판교", country: { connect: { id: korea.id } } },
-		update: {},
-	})
-
-	const wantedlab = await upsertCompany(prisma)("원티드랩")
-	const naver = await upsertCompany(prisma)("네이버")
-
-	await seedTechs(prisma)(Object.values(techs))
-
-	const wantedBackend = await prisma.position.upsert({
+	const wantedBackend = prisma.position.upsert({
 		update: {},
 		where: {
 			title_companyId_regionId: {
@@ -67,7 +71,7 @@ export const seed = async (prisma: PrismaClient) => {
 		},
 	})
 
-	const wantedFrontend = await prisma.position.upsert({
+	const wantedFrontend = prisma.position.upsert({
 		update: {},
 		where: {
 			title_companyId_regionId: {
@@ -86,7 +90,7 @@ export const seed = async (prisma: PrismaClient) => {
 		},
 	})
 
-	const naverBackend = await prisma.position.upsert({
+	const naverBackend = prisma.position.upsert({
 		update: {},
 		where: {
 			title_companyId_regionId: {
@@ -106,11 +110,15 @@ export const seed = async (prisma: PrismaClient) => {
 			region: { connect: { id: pangyo.id } },
 		},
 	})
-	return { wantedBackend, wantedFrontend, naverBackend }
+	const result = await prisma.$transaction([wantedBackend, wantedFrontend, naverBackend])
+    console.log(`upserted positions in ${(performance.now() - now).toFixed()}ms`)
+    return result
 }
 
 if (isMain(import.meta.url)) {
-	const prisma = new PrismaClient()
+    const now = performance.now()
+	const prisma = new PrismaClient({ errorFormat: "minimal" })
+    console.log(`created prisma client in ${(performance.now() - now).toFixed()}ms`)
 	const result = await seed(prisma)
 
 	console.log(result)
