@@ -60,6 +60,8 @@ model Application {
     userId     Int
     position   Position @relation(fields: [positionId], references: [id])
     positionId Int
+
+    @@unique([userId, positionId])
 }
 
 model Position {
