@@ -28,6 +28,7 @@
 		"@swc-node/register": "^1.6.8",
 		"@types/node": "^20.8.3",
 		"prisma": "^5.4.1",
+		"type-fest": "^4.4.0",
 		"typescript": "^5.2.2",
 		"zod-prisma-types": "^2.7.9"
 	}
