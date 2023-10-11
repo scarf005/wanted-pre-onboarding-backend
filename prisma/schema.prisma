@@ -18,7 +18,7 @@ model Country {
     id   Int    @id @default(autoincrement())
     name String @unique
 
-    regions  Region[]
+    regions Region[]
 }
 
 model Region {
@@ -46,6 +46,22 @@ model Tech {
     position Position[] @relation("TechToPosition")
 }
 
+model User {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    applications Application[]
+}
+
+model Application {
+    id Int @id @default(autoincrement())
+
+    User       User     @relation(fields: [userId], references: [id])
+    userId     Int
+    position   Position @relation(fields: [positionId], references: [id])
+    positionId Int
+}
+
 model Position {
     id Int @id @default(autoincrement())
 
@@ -55,10 +71,11 @@ model Position {
 
     techStack Tech[] @relation("TechToPosition")
 
-    company   Company @relation(fields: [companyId], references: [id])
-    companyId Int
-    region    Region  @relation(fields: [regionId], references: [id])
-    regionId  Int
+    company     Company       @relation(fields: [companyId], references: [id])
+    companyId   Int
+    region      Region        @relation(fields: [regionId], references: [id])
+    regionId    Int
+    Application Application[]
 
     @@unique([title, companyId, regionId])
 }

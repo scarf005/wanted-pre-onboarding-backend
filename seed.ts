@@ -15,6 +15,8 @@ const techs = {
 	typescript: "Typescript",
 } as const
 
+const users = ["철수", "영희"]
+
 const upsertWith = (name: string) => ({ where: { name }, create: { name }, update: {} })
 const upsertTech = (prisma: PrismaClient) => (name: string) => prisma.tech.upsert(upsertWith(name))
 
@@ -25,13 +27,13 @@ export const seedTechs = (prisma: PrismaClient) => async (techs: string[]) =>
 	await prisma.$transaction(techs.map(upsertTech(prisma)))
 
 export const seed = async (prisma: PrismaClient) => {
-    const now = performance.now()
+	const now = performance.now()
 	const korea = await prisma.country.upsert({
 		where: { name: "한국" },
 		create: { name: "한국" },
 		update: {},
 	})
-    console.log(`upserted country in ${(performance.now() - now).toFixed()}ms`)
+	console.log(`upserted country in ${(performance.now() - now).toFixed()}ms`)
 	const [seoul, pangyo] = await prisma.$transaction([
 		prisma.region.upsert({
 			where: { name_countryId: { countryId: korea.id, name: "서울" } },
@@ -44,13 +46,16 @@ export const seed = async (prisma: PrismaClient) => {
 			update: {},
 		}),
 	])
-    console.log(`upserted regions in ${(performance.now() - now).toFixed()}ms`)
+	console.log(`upserted regions in ${(performance.now() - now).toFixed()}ms`)
 
 	const [wantedlab, naver] = await prisma.$transaction([
 		...["원티드랩", "네이버"].map(upsertCompany(prisma)),
 		...Object.values(techs).map(upsertTech(prisma)),
+		...users.map((name, id) =>
+			prisma.user.upsert({ where: { id: id + 1 }, create: { name }, update: { name } })
+		),
 	])
-    console.log(`upserted companies and techs in ${(performance.now() - now).toFixed()}ms`)
+	console.log(`upserted companies, techs, users in ${(performance.now() - now).toFixed()}ms`)
 
 	const wantedBackend = prisma.position.upsert({
 		update: {},
@@ -111,14 +116,14 @@ export const seed = async (prisma: PrismaClient) => {
 		},
 	})
 	const result = await prisma.$transaction([wantedBackend, wantedFrontend, naverBackend])
-    console.log(`upserted positions in ${(performance.now() - now).toFixed()}ms`)
-    return result
+	console.log(`upserted positions in ${(performance.now() - now).toFixed()}ms`)
+	return result
 }
 
 if (isMain(import.meta.url)) {
-    const now = performance.now()
+	const now = performance.now()
 	const prisma = new PrismaClient({ errorFormat: "minimal" })
-    console.log(`created prisma client in ${(performance.now() - now).toFixed()}ms`)
+	console.log(`created prisma client in ${(performance.now() - now).toFixed()}ms`)
 	const result = await seed(prisma)
 
 	console.log(result)
