@@ -2,15 +2,9 @@
 
 <header align="center">
 
-![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white) ![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white) 
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white) ![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
 
 </header>
-
-## 과제 요구사항
-
-- [x] 채용공고 등록
-- [x] 채용공고 수정
-
 
 ## 실행 방법
 
@@ -24,12 +18,13 @@ DATABASE_URL="file:./dev.db"
 
 ```sh
 pnpm install # 또는 npm install
+pnpm db # prisma DB 초기화
 pnpm dev
 ```
 
 ## 사용 기술
 
-1. 타입 안전한 코드를 작성하는데 도움이 되는지 
+1. 타입 안전한 코드를 작성하는데 도움이 되는지
 2. 웹 표준을 준수하는지
 
 여부를 기준으로 선택하였습니다.
@@ -44,6 +39,17 @@ pnpm dev
 - [http-terminator](https://github.com/gajus/http-terminator)
   - 개발 모드([`node --watch`](https://nodejs.org/en/blog/release/v18.11.0))에서 서버의 연결을 즉시 끊기 위해 사용했습니다.
 
+## 과제 요구사항
+
+```json
+{
+  "회사_id":회사_id,
+  "채용포지션":"백엔드 주니어 개발자",
+  "채용보상금":1000000,
+  "채용내용":"원티드랩에서 백엔드 주니어 개발자를 채용합니다. 자격요건은..",
+  "사용기술":"Python"
+}
+```
 
 2. 회사는 아래 데이터와 같이 채용공고를 수정합니다. (회사 id 이외 모두 수정 가능합니다.)
 
