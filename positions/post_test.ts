@@ -2,13 +2,13 @@ import test from "node:test"
 import assert from "node:assert/strict"
 
 import { Prisma } from "@prisma/client"
-import { Position, Tech } from "./prisma/generated/zod/index.ts"
+import { Position, Tech } from "../prisma/generated/zod/index.ts"
 import { Hono } from "hono/quick"
 import { testClient } from "hono/testing"
 
-import { createApp } from "./main.ts"
-import { tmpPrismaClient } from "./tmp_prisma_client.ts"
-import { serverUrl, tempDbFileUrl } from "./test_url.ts"
+import { createApp } from "../main.ts"
+import { tmpPrismaClient } from "../tmp_prisma_client.ts"
+import { serverUrl, tempDbFileUrl } from "../test_url.ts"
 
 const position = {
 	title: "주니어 프론트엔드 개발자",
