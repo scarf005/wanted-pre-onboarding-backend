@@ -72,6 +72,9 @@ CREATE UNIQUE INDEX "Company_name_key" ON "Company"("name");
 CREATE UNIQUE INDEX "Tech_name_key" ON "Tech"("name");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Application_userId_positionId_key" ON "Application"("userId", "positionId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Position_title_companyId_regionId_key" ON "Position"("title", "companyId", "regionId");
 
 -- CreateIndex
