@@ -1,19 +1,21 @@
+import { Server } from "node:http"
+
 import { Hono } from "hono"
 import { cors } from "hono/cors"
 import { logger } from "hono/logger"
+
 import { zValidator } from "@hono/zod-validator"
-import { Prisma, PrismaClient } from "@prisma/client"
 import { serve } from "@hono/node-server"
-import { z } from "zod"
 
-import { ApplicationSchema, PositionSchema } from "./prisma/generated/zod/index.ts"
-
-import { NumericSchema } from "./data"
 import { createHttpTerminator } from "http-terminator"
-import { Server } from "node:http"
+
+import { Prisma, PrismaClient } from "@prisma/client"
+import { ApplicationSchema } from "./prisma/generated/zod/index.ts"
+
 import { showUniqueRoutes } from "./unique_routes.ts"
 import { isMain } from "./is_main.ts"
 import { positions } from "./positions/mod.ts"
+import { addGracefulExitListener } from "./graceful_exit.ts"
 
 type Option = { prisma: PrismaClient; app: Hono }
 export const createApp = ({ prisma, app }: Option) =>
@@ -25,31 +27,7 @@ export const createApp = ({ prisma, app }: Option) =>
 
 			return c.jsonT(result)
 		})
-        .route("/positions", positions(prisma))
-		.patch(
-			"/positions/:id",
-			zValidator("param", z.object({ id: NumericSchema })),
-			zValidator("json", PositionSchema.omit({ id: true, companyId: true }).partial().strict()),
-			async (c) => {
-				const { id } = c.req.valid("param")
-				const data = c.req.valid("json")
-
-				const result = await prisma.position.update({ where: { id }, data })
-
-				return c.jsonT(result)
-			},
-		)
-		.delete(
-			"/positions/:id",
-			zValidator("param", z.object({ id: NumericSchema })),
-			async (c) => {
-				const { id } = c.req.valid("param")
-
-				const result = await prisma.position.delete({ where: { id } })
-
-				return c.jsonT(result)
-			},
-		)
+		.route("/positions", positions(prisma))
 		.onError((error, c) => {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				console.log("prisma known request error")
@@ -77,11 +55,5 @@ if (isMain(import.meta.url)) {
 
 	const terminator = createHttpTerminator({ server })
 
-	const events = ["SIGTERM", "beforeExit", "rejectionHandled", "uncaughtException", "exit"]
-	events.forEach((event) =>
-		process.on(event, async (e) => {
-			console.log(`process.on ${event}`, e)
-			await terminator.terminate()
-		})
-	)
+	addGracefulExitListener(terminator)
 }

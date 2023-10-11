@@ -2,14 +2,13 @@ import { Hono } from "hono"
 import { zValidator } from "@hono/zod-validator"
 import { PrismaClient } from "@prisma/client"
 import { z } from "zod"
-import { NumericSchema } from "../data.ts"
 import { getSinglePosition } from "../service.ts"
 import { fuzzySearch } from "../fuzzy_search.ts"
 import { select } from "../select.ts"
+import { idValidator } from "./id_validator.ts"
 
-const searchValidator = zValidator("query", z.object({ search: z.string().min(2).optional() }))
-
-const idValidator = zValidator("param", z.object({ id: NumericSchema }))
+const SearchSchema = z.object({ search: z.string().min(2).optional() })
+const searchValidator = zValidator("query", SearchSchema)
 
 export const get = (prisma: PrismaClient) =>
 	new Hono()
