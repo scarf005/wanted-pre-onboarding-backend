@@ -1,8 +1,8 @@
 import { Hono } from "hono"
 import { zValidator } from "@hono/zod-validator"
 import { PrismaClient } from "@prisma/client"
-import { PositionSchema as RawPositionSchema } from "../prisma/generated/zod/index.ts"
-import { idValidator } from "./id_validator.ts"
+import { PositionSchema as RawPositionSchema } from "../../prisma/generated/zod/index.ts"
+import { idValidator } from "./validators/id_validator.ts"
 
 const PositionSchema = RawPositionSchema
 	.omit({ id: true, companyId: true }).partial().strict()

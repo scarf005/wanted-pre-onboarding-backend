@@ -1,6 +1,6 @@
 import { Hono } from "hono"
 import { PrismaClient } from "@prisma/client"
-import { idValidator } from "./id_validator"
+import { idValidator } from "./validators/id_validator.ts"
 
 export const deletion = (prisma: PrismaClient) =>
 	new Hono().delete("/:id", idValidator, async (c) => {

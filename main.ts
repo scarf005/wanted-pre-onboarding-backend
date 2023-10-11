@@ -10,12 +10,11 @@ import { createHttpTerminator } from "http-terminator"
 
 import { PrismaClient } from "@prisma/client"
 
-import { showUniqueRoutes } from "./unique_routes.ts"
-import { isMain } from "./is_main.ts"
-import { positions } from "./positions/mod.ts"
-import { addGracefulExitListener } from "./graceful_exit.ts"
-import { applications } from "./applications.ts"
-import { prismaErrorHandler } from "./prisma_error_handler.ts"
+import { showUniqueRoutes } from "./utils/unique_routes.ts"
+import { isMain } from "./utils/is_main.ts"
+import { applications, positions } from "./routes/mod.ts"
+import { addGracefulExitListener } from "./utils/graceful_exit.ts"
+import { prismaErrorHandler } from "./utils/prisma_error_handler.ts"
 
 type Option = { prisma: PrismaClient; app: Hono }
 export const createApp = ({ prisma, app }: Option) =>
@@ -25,7 +24,7 @@ export const createApp = ({ prisma, app }: Option) =>
 		.onError(prismaErrorHandler)
 
 if (isMain(import.meta.url)) {
-	const prisma = new PrismaClient()
+	const prisma = new PrismaClient({ log: ["error", "warn", "info"] })
 	const hono = new Hono().use(logger()).use("/*", cors())
 	const app = createApp({ prisma, app: hono })
 

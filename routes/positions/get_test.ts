@@ -1,10 +1,10 @@
 import test from "node:test"
 import assert from "node:assert/strict"
-import { createApp } from "../main.ts"
-import { tmpPrismaClient } from "../tmp_prisma_client.ts"
+import { createApp } from "../../main.ts"
+import { tmpPrismaClient } from "../../utils/tmp_prisma_client.ts"
 import { Hono } from "hono/quick"
-import { serverUrl, tempDbFileUrl } from "../test_url.ts"
 import { testClient } from "hono/testing"
+import { tempDbFileUrl } from "../../utils/test_url.ts"
 
 test("GET /positions", { concurrency: true }, async (t) => {
 	await using client = await tmpPrismaClient(tempDbFileUrl())
