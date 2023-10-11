@@ -3,7 +3,7 @@ import { promisify } from "node:util"
 import fs from "node:fs/promises"
 import url from "node:url"
 
-import { PrismaClient } from "@prisma/client"
+import { Prisma, PrismaClient } from "@prisma/client"
 
 const execFile = promisify(execFileCb)
 
@@ -23,6 +23,12 @@ const migratePrisma = (dbUrl: url.URL) =>
 
 type Option = {
 	silent: boolean
+	prismaOptions: Prisma.PrismaClientOptions
+}
+
+const defaultOption = {
+	silent: true,
+	prismaOptions: {},
 }
 
 /**
@@ -40,17 +46,18 @@ type Option = {
  */
 export const tmpPrismaClient = async (
 	dbUrl: url.URL,
-	{ silent }: Option = { silent: false },
+	option?: Partial<Option>,
 ): Promise<{ prisma: PrismaClient } & AsyncDisposable> => {
-    const log = silent ? () => {} : console.debug
+	const { silent, prismaOptions } = { ...defaultOption, ...option }
+	const log = silent ? () => {} : console.debug
 
-    const now = performance.now()
+	const now = performance.now()
 	await migratePrisma(dbUrl)
-    const migrate = performance.now()
-    log(`migrated prisma client ${dbUrl} in ${(migrate - now).toFixed()}ms`)
+	const migrate = performance.now()
+	log(`migrated prisma client ${dbUrl} in ${(migrate - now).toFixed()}ms`)
 
-	const prisma = new PrismaClient({ datasourceUrl: dbUrl.toString() })
-    const connect = performance.now()
+	const prisma = new PrismaClient({ ...prismaOptions, datasourceUrl: dbUrl.toString() })
+	const connect = performance.now()
 	log(`connected prisma client ${dbUrl} in ${(connect - migrate).toFixed()}ms`)
 
 	return {
