@@ -12,13 +12,12 @@ const PositionSchema = RawPositionSchema
 const bodyValidator = zValidator("json", PositionSchema)
 
 export const post = (prisma: PrismaClient) =>
-	new Hono()
-		.post("/", bodyValidator, async (c) => {
-			const { techStack, ...rest } = c.req.valid("json")
+	new Hono().post("/", bodyValidator, async (c) => {
+		const { techStack, ...rest } = c.req.valid("json")
 
-			const result = await prisma.position.create({
-				data: { ...rest, techStack: { connect: techStack } },
-			})
-
-			return c.jsonT(result)
+		const result = await prisma.position.create({
+			data: { ...rest, techStack: { connect: techStack } },
 		})
+
+		return c.jsonT(result)
+	})
