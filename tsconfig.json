@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"target": "ESNext",
 		"module": "ESNext",
-        "lib": ["ESNext", "dom", "esnext.disposable"],
+		"lib": ["ESNext", "dom", "esnext.disposable"],
 		"moduleResolution": "Bundler",
 		"noEmit": true,
 		"esModuleInterop": true,
