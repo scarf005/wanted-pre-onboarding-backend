@@ -1,5 +1,5 @@
 {
-    "exclude": ["prisma"],
+	"exclude": ["prisma"],
 	"fmt": {
 		"semiColons": false,
 		"lineWidth": 100,

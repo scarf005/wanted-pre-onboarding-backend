@@ -8,7 +8,7 @@
 		"db:init": "npm exec prisma migrate dev -- --name dev",
 		"prod": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm main.ts",
 		"dev": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm --watch main.ts",
-		"test": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm --test get_test.ts post_test.ts"
+		"test": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm test.ts"
 	},
 	"prisma": {
 		"seed": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm seed.ts"
@@ -30,6 +30,7 @@
 		"@swc-node/register": "^1.6.8",
 		"@types/node": "^20.8.3",
 		"prisma": "^5.4.1",
+		"tiny-glob": "^0.2.9",
 		"type-fest": "^4.4.0",
 		"typescript": "^5.2.2",
 		"zod-prisma-types": "^2.7.9"

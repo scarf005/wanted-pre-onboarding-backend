@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client"
-import { isMain } from "./is_main"
+import { isMain } from "./utils/is_main.ts"
 
 const titles = {
 	wantedBackend: "주니어 백엔드 개발자",

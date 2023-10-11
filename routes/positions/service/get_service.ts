@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client"
-import { select } from "./main.ts"
+import { select } from "../select.ts"
 
 export const getSinglePosition = async (prisma: PrismaClient, id: number) => {
 	const result = await prisma.position.findUnique({

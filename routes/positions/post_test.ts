@@ -1,14 +1,13 @@
 import test from "node:test"
 import assert from "node:assert/strict"
 
-import { Prisma } from "@prisma/client"
-import { Position, Tech } from "./prisma/generated/zod/index.ts"
+import { Prisma, Tech } from "@prisma/client"
 import { Hono } from "hono/quick"
 import { testClient } from "hono/testing"
 
-import { createApp } from "./main.ts"
-import { tmpPrismaClient } from "./tmp_prisma_client.ts"
-import { serverUrl, tempDbFileUrl } from "./test_url.ts"
+import { createApp } from "../../main.ts"
+import { tempDbFileUrl } from "../../utils/test_url.ts"
+import { tmpPrismaClient } from "../../utils/tmp_prisma_client.ts"
 
 const position = {
 	title: "주니어 프론트엔드 개발자",
@@ -28,12 +27,9 @@ test("POST /positions", { concurrency: true }, async (t) => {
 	const testApp = testClient(app)
 
 	const invalid = t.test("올바르지 않은 형식", async () => {
-		const req = new Request(`${serverUrl}/positions`, {
-			method: "POST",
-			body: JSON.stringify({ ...position, title: undefined }),
-		})
+		// @ts-expect-error: title이 없음
+		const res = await testApp.positions.$post({ json: { ...position, title: undefined } })
 
-		const res = await app.request(req)
 		assert.equal(res.status, 400)
 	})
 
@@ -44,16 +40,14 @@ test("POST /positions", { concurrency: true }, async (t) => {
 		assert.equal(res.status, 200)
 
 		await t.test("새로운 포지션이 올바르게 추가됨", async () => {
-			const req = new Request(`${serverUrl}/positions`)
-
-			const res = await app.request(req)
+			const res = await testApp.positions.$get({ query: {} })
 			assert.equal(res.status, 200)
 
 			const data = await res.json()
 			assert.equal(data.length, prev.length + 1)
 
 			const last = data.at(-1)
-			assert.equal(last.techStack.length, position.techStack.length)
+			assert.equal(last?.techStack.length, position.techStack.length)
 		})
 	})
 
