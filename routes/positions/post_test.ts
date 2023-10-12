@@ -33,7 +33,7 @@ test("POST /positions", { concurrency: true }, async (t) => {
 		assert.equal(res.status, 400)
 	})
 
-	const create = t.test("새 공고 생성", async (t) => {
+	const create = t.test("채용 공고 등록하기", async (t) => {
 		const prev = await prisma.position.findMany()
 
 		const res = await testApp.positions.$post({ json: position })
