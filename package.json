@@ -31,7 +31,6 @@
 		"@types/node": "^20.8.3",
 		"prisma": "^5.4.1",
 		"tiny-glob": "^0.2.9",
-		"type-fest": "^4.4.0",
 		"typescript": "^5.2.2",
 		"zod-prisma-types": "^2.7.9"
 	}
