@@ -26,7 +26,7 @@ test("GET /positions", { concurrency: true }, async (t) => {
 		assert.equal(res.status, 200)
 
 		const json = await res.json()
-		assert.notEqual(json.length, 0)
+		assert.equal(json.length, 1)
 	})
 
 	const singlePosition = t.test("단일 포지션 조회", async (t) => {

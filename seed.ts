@@ -89,7 +89,7 @@ export const seed = async (prisma: PrismaClient) => {
 			title: titles.wantedFrontend,
 			description: "원티드랩에서 프론트엔드 주니어 개발자를 채용합니다. 자격요건은..",
 			reward: 1500000,
-			techStack: { connect: [{ name: techs.typescript }, { name: techs.postgresql }] },
+			techStack: { connect: [{ name: techs.typescript }] },
 			company: { connect: { name: wantedlab.name } },
 			region: { connect: { id: seoul.id } },
 		},
