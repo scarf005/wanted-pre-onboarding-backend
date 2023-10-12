@@ -3,7 +3,7 @@ import { Hono } from "hono"
 
 import { get } from "./get.ts"
 import { post } from "./post.ts"
-import { deletion } from "./deletion.ts"
+import { deletion } from "./delete.ts"
 import { patch } from "./patch.ts"
 
 export const positions = (prisma: PrismaClient) =>
