@@ -15,6 +15,7 @@ import { isMain } from "./utils/is_main.ts"
 import { applications, positions } from "./routes/mod.ts"
 import { addGracefulExitListener } from "./utils/graceful_exit.ts"
 import { prismaErrorHandler } from "./utils/prisma_error_handler.ts"
+import { prettyJson } from "./utils/pretty_json.ts"
 
 export type AppType = ReturnType<typeof createApp>
 
@@ -27,7 +28,9 @@ export const createApp = ({ prisma, app }: Option) =>
 
 if (isMain(import.meta.url)) {
 	const prisma = new PrismaClient({ log: ["error", "warn", "info"] })
-	const hono = new Hono().use(logger()).use("/*", cors())
+	const hono = new Hono().use(logger()).use("*", cors())
+		.use("*", prettyJson)
+
 	const app = createApp({ prisma, app: hono })
 
 	showUniqueRoutes(8)(app)
