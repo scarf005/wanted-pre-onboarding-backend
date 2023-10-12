@@ -13,19 +13,49 @@
 
 ## 실행 방법
 
-1. prisma 연결을 위한 `.env` 파일을 생성합니다.
+1. 저장소를 내려받습니다.
 
 ```sh
-DATABASE_URL="file:./dev.db"
+git clone https://github.com/scarf005/wanted-pre-onboarding-backend.git
+cd wanted-pre-onboarding-backend/
 ```
 
-2. 패키지 의존성을 설치하고 서버를 실행합니다.
+2. prisma 연결을 위해 `.env` 파일을 생성합니다.
 
 ```sh
-pnpm install # 또는 npm install
-pnpm db # prisma DB 초기화
+echo 'DATABASE_URL="file:./dev.db"' > .env
+```
+
+3. 패키지 의존성을 설치합니다.
+
+```sh
+pnpm install
+pnpm db:init # prisma DB 초기화
+
+# npm의 경우
+npm install
+npm run db:init
+```
+
+### 서버 실행
+
+```sh
+pnpm start
+
+# npm의 경우
+npm start
+```
+
+### 서버 실행 (개발 모드)
+
+```sh
 pnpm dev
+
+# npm의 경우
+npm run dev
 ```
+
+Node 18 버전의 [watch 모드](https://nodejs.org/en/blog/release/v18.11.0#watch-mode-experimental)를 사용해 파일이 수정될 때마다 서버가 자동으로 재시작됩니다.
 
 ## 사용 기술
 

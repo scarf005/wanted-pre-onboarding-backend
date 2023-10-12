@@ -6,7 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"db:init": "npm exec prisma migrate dev -- --name dev",
-		"prod": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm main.ts",
+		"start": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm main.ts",
 		"dev": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm --watch main.ts",
 		"test": "node --no-warnings=ExperimentalWarning --loader @swc-node/register/esm test.ts"
 	},
