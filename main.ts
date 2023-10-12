@@ -16,6 +16,7 @@ import { applications, positions } from "./routes/mod.ts"
 import { addGracefulExitListener } from "./utils/graceful_exit.ts"
 import { prismaErrorHandler } from "./utils/prisma_error_handler.ts"
 import { prettyJson } from "./utils/pretty_json.ts"
+import z from "zod"
 
 export type AppType = ReturnType<typeof createApp>
 
@@ -35,8 +36,9 @@ if (isMain(import.meta.url)) {
 
 	showUniqueRoutes(8)(app)
 
+	const port = z.coerce.number().catch(3000).parse(process.env.PORT)
 	const server = serve(
-		{ fetch: app.fetch, port: 3000 },
+		{ fetch: app.fetch, port },
 		({ address, port }) => console.log(`Server listening at ${address}:${port}`),
 	) as Server
 
