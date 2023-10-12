@@ -57,6 +57,297 @@ npm run dev
 
 Node 18 버전의 [watch 모드](https://nodejs.org/en/blog/release/v18.11.0#watch-mode-experimental)를 사용해 파일이 수정될 때마다 서버가 자동으로 재시작됩니다.
 
+## 요구사항 구현
+
+### 1. 채용공고 등록 `POST /positions`
+
+```json
+{
+	"title": "새 개발자 모집",
+	"description": "새로운 백엔드 개발자를 모집합니다.",
+	"companyId": 1,
+	"regionId": 1,
+	"reward": null,
+	"techStack": [{ "id": 1 }]
+}
+```
+
+```sh
+curl 'http://localhost:3000/positions' -X POST -H "content-type: application/json" --data-binary  '{"title":"새 개발자 모집","description":"새로운 백엔드 개발자를 모집합니다.","companyId":1,"regionId":1,"reward":null,"techStack":[{"id":1}]}'
+```
+
+<details><summary>예시 반환값</summary>
+
+```json
+{
+	"id": 4,
+	"title": "새 개발자 모집",
+	"description": "새로운 백엔드 개발자를 모집합니다.",
+	"reward": null,
+	"companyId": 1,
+	"regionId": 1
+}
+```
+
+</details>
+
+### 2. 채용공고 수정 `PATCH /positions/:id`
+
+회사 id를 제외한 모든 필드를 수정할 수 있습니다.
+
+```json
+{
+	"reward": 12345
+}
+```
+
+```sh
+curl 'http://localhost:3000/positions/1' -X PATCH -H "content-type: application/json" --data-binary '{"reward":12345}'
+```
+
+<details><summary>예시 반환값</summary>
+
+```json
+{
+	"id": 1,
+	"title": "주니어 백엔드 개발자",
+	"description": "원티드랩에서 백엔드 주니어 개발자를 채용합니다. 자격요건은..",
+	"reward": 12345,
+	"companyId": 1,
+	"regionId": 1
+}
+```
+
+</details>
+
+### 3. 채용공고 삭제 `DELETE /positions/:id`
+
+채용공고를 삭제합니다.
+
+```sh
+curl 'http://localhost:3000/positions/4' -X DELETE
+```
+
+<details><summary>예시 반환값</summary>
+
+```json
+{
+	"id": 4,
+	"title": "새 개발자 모집",
+	"description": "새로운 백엔드 개발자를 모집합니다.",
+	"reward": null,
+	"companyId": 1,
+	"regionId": 1
+}
+```
+
+</details>
+
+### 4. 채용공고 조회 `GET /positions`
+
+```sh
+curl 'http://localhost:3000/positions' -X GET
+```
+
+<details><summary>예시 반환값</summary>
+
+```json
+[
+	{
+		"id": 1,
+		"title": "주니어 백엔드 개발자",
+		"reward": 1500000,
+		"techStack": [
+			{
+				"id": 3,
+				"name": "PostgreSQL"
+			},
+			{
+				"id": 5,
+				"name": "Typescript"
+			}
+		],
+		"company": {
+			"id": 1,
+			"name": "원티드랩"
+		},
+		"region": {
+			"id": 1,
+			"name": "서울",
+			"countryId": 1
+		}
+	},
+	{
+		"id": 2,
+		"title": "주니어 프론트엔드 개발자",
+		"reward": 1500000,
+		"techStack": [
+			{
+				"id": 3,
+				"name": "PostgreSQL"
+			},
+			{
+				"id": 5,
+				"name": "Typescript"
+			}
+		],
+		"company": {
+			"id": 1,
+			"name": "원티드랩"
+		},
+		"region": {
+			"id": 1,
+			"name": "서울",
+			"countryId": 1
+		}
+	},
+	{
+		"id": 3,
+		"title": "Django 백엔드 개발자",
+		"reward": 1000000,
+		"techStack": [
+			{
+				"id": 1,
+				"name": "Python"
+			},
+			{
+				"id": 2,
+				"name": "Django"
+			},
+			{
+				"id": 3,
+				"name": "PostgreSQL"
+			}
+		],
+		"company": {
+			"id": 2,
+			"name": "네이버"
+		},
+		"region": {
+			"id": 2,
+			"name": "판교",
+			"countryId": 1
+		}
+	}
+]
+```
+
+</details>
+
+### 4-1. 채용공고 검색 `GET /positions?search=`
+
+```sh
+# http://localhost:3000/positions?search=네이버
+curl -G 'http://localhost:3000/positions' --data-urlencode 'search=네이버'
+```
+
+<details><summary>예시 반환값</summary>
+
+```json
+[
+  {
+    "id": 3,
+    "title": "Django 백엔드 개발자",
+    "reward": 1000000,
+    "techStack": [
+      {
+        "id": 1,
+        "name": "Python"
+      },
+      {
+        "id": 2,
+        "name": "Django"
+      },
+      {
+        "id": 3,
+        "name": "PostgreSQL"
+      }
+    ],
+    "company": {
+      "id": 2,
+      "name": "네이버"
+    },
+    "region": {
+      "id": 2,
+      "name": "판교",
+      "countryId": 1
+    }
+  }
+]
+```
+
+</details>
+
+### 5. 채용 상세 페이지 조회 `GET /positions/:id`
+
+```sh
+curl 'http://localhost:3000/positions/1' -X GET
+```
+
+<details><summary>예시 반환값</summary>
+
+```json
+{
+  "id": 1,
+  "title": "주니어 백엔드 개발자",
+  "reward": 1500000,
+  "techStack": [
+    {
+      "id": 3,
+      "name": "PostgreSQL"
+    },
+    {
+      "id": 5,
+      "name": "Typescript"
+    }
+  ],
+  "company": {
+    "id": 1,
+    "name": "원티드랩"
+  },
+  "region": {
+    "id": 1,
+    "name": "서울",
+    "countryId": 1
+  },
+  "description": "원티드랩에서 백엔드 주니어 개발자를 채용합니다. 자격요건은..",
+  "otherPositions": [
+    {
+      "id": 2
+    }
+  ]
+}
+```
+
+</details>
+
+### 6. 채용공고 지원 `POST /applications`
+
+```sh
+curl 'http://localhost:3000/applications' -X POST -H "content-type: application/json" --data-binary '{"userId":1,"positionId":1}'
+```
+
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "positionId": 1
+}
+```
+
+<details><summary>예시 반환값</summary>
+
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "positionId": 1
+}
+```
+
+</details>
+
+
 ## 사용 기술
 
 1. 타입 안전한 코드를 작성하는데 도움이 되는지
@@ -74,155 +365,9 @@ Node 18 버전의 [watch 모드](https://nodejs.org/en/blog/release/v18.11.0#wat
 - [http-terminator](https://github.com/gajus/http-terminator)
   - 개발 모드([`node --watch`](https://nodejs.org/en/blog/release/v18.11.0))에서 서버의 연결을 즉시 끊기 위해 사용했습니다.
 
-## 과제 요구사항
 
-```json
-{
-  "회사_id":회사_id,
-  "채용포지션":"백엔드 주니어 개발자",
-  "채용보상금":1000000,
-  "채용내용":"원티드랩에서 백엔드 주니어 개발자를 채용합니다. 자격요건은..",
-  "사용기술":"Python"
-}
-```
+## 유닛 테스트
 
-2. 회사는 아래 데이터와 같이 채용공고를 수정합니다. (회사 id 이외 모두 수정 가능합니다.)
+node.js에서 기본적으로 제공하는 test runner를 활용했습니다.
 
-Example) 데이터 예시이며, 필드명은 임의로 설정가능합니다.
-
-```json
-{
-  "채용포지션":"백엔드 주니어 개발자",
-  "채용보상금":1500000, # 변경됨
-  "채용내용":"원티드랩에서 백엔드 주니어 개발자를 '적극' 채용합니다. 자격요건은..", # 변경됨
-  "사용기술":"Python"
-}
-```
-
-or
-
-```json
-{
-  "채용포지션":"백엔드 주니어 개발자",
-  "채용보상금":1000000,
-  "채용내용":"원티드랩에서 백엔드 주니어 개발자를 채용합니다. 자격요건은..",
-  "사용기술":"Django" # 변경됨
-}
-```
-
-3. 채용공고를 삭제합니다.
-
-DB에서 삭제됩니다.
-
-4. 채용공고 목록을 가져옵니다.
-
-4-1. 사용자는 채용공고 목록을 아래와 같이 확인할 수 있습니다.
-
-Example)
-
-```json
-[
-	{
-		"채용공고_id": 채용공고_id,
-	  "회사명":"원티드랩",
-	  "국가":"한국",
-	  "지역":"서울",
-	  "채용포지션":"백엔드 주니어 개발자",
-	  "채용보상금":1500000,
-	  "사용기술":"Python"
-	},
-	{
-		"채용공고_id": 채용공고_id,
-	  "회사명":"네이버",
-	  "국가":"한국",
-	  "지역":"판교",
-	  "채용포지션":"Django 백엔드 개발자",
-	  "채용보상금":1000000,
-	  "사용기술":"Django"
-	},
-  ...
-]
-```
-
-4-2. 채용공고 검색 기능 구현(선택사항 및 가산점요소).
-
-```json
-# Example - 1) some/url?search=원티드
-[
-	{
-		"채용공고_id": 채용공고_id,
-	  "회사명":"원티드랩",
-	  "국가":"한국",
-	  "지역":"서울",
-	  "채용포지션":"백엔드 주니어 개발자",
-	  "채용보상금":1500000,
-	  "사용기술":"Python"
-	},
-	{
-		"채용공고_id": 채용공고_id,
-	  "회사명":"원티드코리아",
-	  "국가":"한국",
-	  "지역":"부산",
-	  "채용포지션":"프론트엔드 개발자",
-	  "채용보상금":500000,
-	  "사용기술":"javascript"
-	}
-]
-
-# Example - 2) some/url?search=Django
-[
-	{
-		"채용공고_id": 채용공고_id,
-	  "회사명":"네이버",
-	  "국가":"한국",
-	  "지역":"판교",
-	  "채용포지션":"Django 백엔드 개발자",
-	  "채용보상금":1000000,
-	  "사용기술":"Django"
-	},
-	{
-		"채용공고_id": 채용공고_id,
-	  "회사명":"카카오",
-	  "국가":"한국",
-	  "지역":"판교",
-	  "채용포지션":"Django 백엔드 개발자",
-	  "채용보상금":500000,
-	  "사용기술":"Python"
-	}
-  ...
-]
-```
-
-5. 채용 상세 페이지를 가져옵니다.
-
-사용자는 채용상세 페이지를 아래와 같이 확인할 수 있습니다.
-
-- “채용내용”이 추가적으로 담겨있음.
-- 해당 회사가 올린 다른 채용공고 가 추가적으로 포함됩니다(선택사항 및 가산점요소).
-
-```json
-Example)
-{
-	"채용공고_id": 채용공고_id,
-  "회사명":"원티드랩",
-  "국가":"한국",
-  "지역":"서울",
-  "채용포지션":"백엔드 주니어 개발자",
-  "채용보상금":1500000,
-  "사용기술":"Python",
-	"채용내용": "원티드랩에서 백엔드 주니어 개발자를 채용합니다. 자격요건은..",
-	"회사가올린다른채용공고":[채용공고_id, 채용공고_id, ..] # id List (선택사항 및 가산점요소).
-}
-```
-
-6. 사용자는 채용공고에 지원합니다(선택사항 및 가산점요소).
-
-사용자는 채용공고에 아래와 같이 지원합니다. (가점 요소이며, 필수 구현 요소가 아님) 사용자는 1회만 지원 가능합니다.
-
-```json
-Example)
-{
-	"채용공고_id": 채용공고_id,
-  "사용자_id": 사용자_id
-}
-```
+![backend : fish_01](https://github.com/scarf005/wanted-pre-onboarding-backend/assets/54838975/6d6328ae-da3d-4848-aa35-97e05af5f7eb)
