@@ -1,6 +1,11 @@
 import { PrismaClient } from "@prisma/client"
 import { select } from "../select.ts"
+import { fuzzySearch } from "./fuzzy_search.ts"
 
+export const getAllPositions = async (prisma: PrismaClient, search: string | undefined) =>{
+    console.error(fuzzySearch(search))
+	return prisma.position.findMany({ select, where: fuzzySearch(search) })
+}
 export const getSinglePosition = async (prisma: PrismaClient, id: number) => {
 	const result = await prisma.position.findUnique({
 		where: { id },
