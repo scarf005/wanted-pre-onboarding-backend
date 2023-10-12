@@ -16,6 +16,8 @@ import { applications, positions } from "./routes/mod.ts"
 import { addGracefulExitListener } from "./utils/graceful_exit.ts"
 import { prismaErrorHandler } from "./utils/prisma_error_handler.ts"
 
+export type AppType = ReturnType<typeof createApp>
+
 type Option = { prisma: PrismaClient; app: Hono }
 export const createApp = ({ prisma, app }: Option) =>
 	app
