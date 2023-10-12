@@ -15,7 +15,7 @@ const position = {
 	regionId: 1,
 	companyId: 2,
 	reward: null,
-	techStack: [{ name: "Typescript" }],
+	techStack: [{ id: 5 }],
 } as const satisfies Prisma.PositionUncheckedCreateWithoutTechStackInput & {
 	techStack: Partial<Tech>[]
 }

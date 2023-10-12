@@ -1,7 +1,7 @@
 import { Hono } from "hono"
 import { zValidator } from "@hono/zod-validator"
 import { PrismaClient } from "@prisma/client"
-import { PositionMutationSchema } from "./position_mutation.ts"
+import { PositionMutationSchema } from "./validators/position_mutation.ts"
 
 const bodyValidator = zValidator("json", PositionMutationSchema)
 

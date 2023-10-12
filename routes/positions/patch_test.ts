@@ -17,7 +17,7 @@ test("PATCH /positons/:id", { concurrency: true }, async (t) => {
 	const ok = t.test("기존 공고 수정 성공", async () => {
 		const res = await testApp.positions[":id"].$patch({
 			param: { id: "1" },
-			json: { title: "수정된 제목" },
+			json: { title: "수정된 제목", techStack: [{ id: 1 }] },
 		})
 
 		assert.equal(res.status, 200)
@@ -33,7 +33,7 @@ test("PATCH /positons/:id", { concurrency: true }, async (t) => {
 	const failNoSuchTech = t.test("존재하지 않는 기술 스택으로 수정하기", async () => {
 		const res = await testApp.positions[":id"].$patch({
 			param: { id: "1" },
-			json: { techStack: [{ name: "존재하지 않는 기술" }] },
+			json: { techStack: [{ id: 123123 }] },
 		})
 
 		assert.equal(res.status, 400)

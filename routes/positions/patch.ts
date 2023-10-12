@@ -2,7 +2,7 @@ import { Hono } from "hono"
 import { zValidator } from "@hono/zod-validator"
 import { PrismaClient } from "@prisma/client"
 import { idValidator } from "./validators/id_validator.ts"
-import { PositionMutationSchema } from "./position_mutation.ts"
+import { PositionMutationSchema } from "./validators/position_mutation.ts"
 
 const PositionSchema = PositionMutationSchema
 	.omit({ companyId: true })
@@ -17,7 +17,7 @@ export const patch = (prisma: PrismaClient) =>
 
 		const result = await prisma.position.update({
 			where: { id },
-			data: { ...rest, techStack: { connect: techStack } },
+			data: { ...rest, techStack: { set: techStack } },
 		})
 		return c.jsonT(result)
 	})
