@@ -17,9 +17,9 @@ test("DELETE /positons/:id", { concurrency: true }, async (t) => {
 	const ok = t.test("기존 공고 삭제 성공", async (t) => {
 		const before = await prisma.position.findMany()
 		const res = await testApp.positions[":id"].$delete({ param: { id: "1" } })
-        const after = await prisma.position.findMany()
+		const after = await prisma.position.findMany()
 
-        assert.equal(res.status, 200)
+		assert.equal(res.status, 200)
 		await t.test("DB에서 공고가 삭제됨", async () => {
 			assert.equal(before.length - 1, after.length)
 		})
