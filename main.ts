@@ -21,8 +21,8 @@ export type AppType = ReturnType<typeof createApp>
 type Option = { prisma: PrismaClient; app: Hono }
 export const createApp = ({ prisma, app }: Option) =>
 	app
-		.route("/applications", applications(prisma))
 		.route("/positions", positions(prisma))
+		.route("/applications", applications(prisma))
 		.onError(prismaErrorHandler)
 
 if (isMain(import.meta.url)) {
