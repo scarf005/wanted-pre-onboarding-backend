@@ -14,7 +14,7 @@ test("PATCH /positons/:id", { concurrency: true }, async (t) => {
 	const app = createApp({ prisma, app: new Hono() })
 	const testApp = testClient(app)
 
-	const ok = t.test("채용 공고 수정하기", async () => {
+	await t.test("채용 공고 수정하기", async () => {
 		const res = await testApp.positions[":id"].$patch({
 			param: { id: "1" },
 			json: { title: "수정된 제목", techStack: [{ id: 1 }] },
@@ -48,5 +48,5 @@ test("PATCH /positons/:id", { concurrency: true }, async (t) => {
 		assert.equal(res.status, 400)
 	})
 
-	await Promise.all([ok, failNotExist, failNoSuchTech, cannotChangeCompanyId])
+	await Promise.all([failNotExist, failNoSuchTech, cannotChangeCompanyId])
 })
