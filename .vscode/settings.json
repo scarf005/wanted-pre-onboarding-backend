@@ -1,7 +1,7 @@
 {
 	"deno.enable": false,
 	"deno.config": "./deno.jsonc",
-	"[typescript]": {
+	"[json][markdown][typescript][typescriptreact]": {
 		"editor.defaultFormatter": "denoland.vscode-deno"
 	}
 	// "typescript.preferGoToSourceDefinition": true
