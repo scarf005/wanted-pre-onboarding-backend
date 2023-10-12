@@ -1,7 +1,0 @@
-services:
-  sqlite3:
-    image: keinos/sqlite3
-    stdin_open: true
-    tty: true
-    volumes:
-      - ./db/:/root/db/

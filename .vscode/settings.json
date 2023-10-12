@@ -1,8 +1,12 @@
 {
 	"deno.enable": false,
+	"deno.enablePaths": ["integration.ts"],
 	"deno.config": "./deno.jsonc",
 	"[json][markdown][typescript][typescriptreact]": {
 		"editor.defaultFormatter": "denoland.vscode-deno"
+	},
+	"search.exclude": {
+		"prisma/generated": true
 	}
 	// "typescript.preferGoToSourceDefinition": true
 }

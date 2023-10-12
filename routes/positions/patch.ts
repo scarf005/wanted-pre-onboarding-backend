@@ -6,7 +6,7 @@ import { PositionMutationSchema } from "./validators/position_mutation.ts"
 
 const PositionSchema = PositionMutationSchema
 	.omit({ companyId: true })
-    .partial()
+	.partial()
 
 const bodyValidator = zValidator("json", PositionSchema)
 
