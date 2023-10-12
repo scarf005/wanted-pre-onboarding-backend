@@ -245,34 +245,34 @@ curl -G 'http://localhost:3000/positions' --data-urlencode 'search=네이버'
 
 ```json
 [
-  {
-    "id": 3,
-    "title": "Django 백엔드 개발자",
-    "reward": 1000000,
-    "techStack": [
-      {
-        "id": 1,
-        "name": "Python"
-      },
-      {
-        "id": 2,
-        "name": "Django"
-      },
-      {
-        "id": 3,
-        "name": "PostgreSQL"
-      }
-    ],
-    "company": {
-      "id": 2,
-      "name": "네이버"
-    },
-    "region": {
-      "id": 2,
-      "name": "판교",
-      "countryId": 1
-    }
-  }
+	{
+		"id": 3,
+		"title": "Django 백엔드 개발자",
+		"reward": 1000000,
+		"techStack": [
+			{
+				"id": 1,
+				"name": "Python"
+			},
+			{
+				"id": 2,
+				"name": "Django"
+			},
+			{
+				"id": 3,
+				"name": "PostgreSQL"
+			}
+		],
+		"company": {
+			"id": 2,
+			"name": "네이버"
+		},
+		"region": {
+			"id": 2,
+			"name": "판교",
+			"countryId": 1
+		}
+	}
 ]
 ```
 
@@ -288,34 +288,34 @@ curl 'http://localhost:3000/positions/1' -X GET
 
 ```json
 {
-  "id": 1,
-  "title": "주니어 백엔드 개발자",
-  "reward": 1500000,
-  "techStack": [
-    {
-      "id": 3,
-      "name": "PostgreSQL"
-    },
-    {
-      "id": 5,
-      "name": "Typescript"
-    }
-  ],
-  "company": {
-    "id": 1,
-    "name": "원티드랩"
-  },
-  "region": {
-    "id": 1,
-    "name": "서울",
-    "countryId": 1
-  },
-  "description": "원티드랩에서 백엔드 주니어 개발자를 채용합니다. 자격요건은..",
-  "otherPositions": [
-    {
-      "id": 2
-    }
-  ]
+	"id": 1,
+	"title": "주니어 백엔드 개발자",
+	"reward": 1500000,
+	"techStack": [
+		{
+			"id": 3,
+			"name": "PostgreSQL"
+		},
+		{
+			"id": 5,
+			"name": "Typescript"
+		}
+	],
+	"company": {
+		"id": 1,
+		"name": "원티드랩"
+	},
+	"region": {
+		"id": 1,
+		"name": "서울",
+		"countryId": 1
+	},
+	"description": "원티드랩에서 백엔드 주니어 개발자를 채용합니다. 자격요건은..",
+	"otherPositions": [
+		{
+			"id": 2
+		}
+	]
 }
 ```
 
@@ -329,9 +329,9 @@ curl 'http://localhost:3000/applications' -X POST -H "content-type: application/
 
 ```json
 {
-  "id": 1,
-  "userId": 1,
-  "positionId": 1
+	"id": 1,
+	"userId": 1,
+	"positionId": 1
 }
 ```
 
